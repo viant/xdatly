@@ -2,3 +2,6 @@
 
 package imports
 
+import (
+	_ "github.com/viant/xdatly/types/core"
+)

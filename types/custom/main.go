@@ -1,3 +1,5 @@
 package main
 
-import _ "github.com/viant/datly/xregistry/types/custom/imports"
+import (
+	_ "github.com/viant/xdatly/types/custom/imports"
+)
