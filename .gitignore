@@ -1,0 +1,17 @@
+.idea
+secrets.json
+*.db
+local_test.go
+vendor
+datly
+other
+mydb
+tmp/
+*.gz
+.DS_Store
+autogen
+dsql
+*.iml
+*.so
+logs
+.datly
