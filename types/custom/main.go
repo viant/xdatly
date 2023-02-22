@@ -1,5 +1,5 @@
 package custom
 
 import (
-	_ "github.com/viant/xdatly/types/custom/imports"
+	_ "github.com/viant/xdatly/types/custom/generated"
 )
