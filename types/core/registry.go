@@ -1,10 +1,15 @@
 package core
 
 import (
+	"fmt"
+	"os"
 	"reflect"
+	"strings"
 	"sync"
 	"time"
 )
+
+var debugEnabled = os.Getenv("DATLY_DEBUG") != ""
 
 func RegisterType(packageName, typeName string, rType reflect.Type, insertedAt time.Time) {
 	instance.register(packageName, typeName, rType, insertedAt)
@@ -14,9 +19,17 @@ func Types(callback NotifierFn) (types map[string]map[string]reflect.Type, close
 	return instance.types(callback)
 }
 
-var instance = &registry{
-	packages:  map[string]*packageRegistry{},
-	notifiers: map[int64]NotifierFn{},
+var instance *registry
+
+func init() {
+	instance = newRegistry()
+}
+
+func newRegistry() *registry {
+	return &registry{
+		packages:  map[string]*packageRegistry{},
+		notifiers: map[int64]NotifierFn{},
+	}
 }
 
 type (
@@ -46,7 +59,7 @@ func (r *packageRegistry) register(typeName string, rType reflect.Type, inserted
 			rType:    rType,
 		}
 		r.index[typeName] = anEntry
-		return false
+		return true
 	}
 
 	if anEntry.inserted.After(insertedAt) {
@@ -58,14 +71,31 @@ func (r *packageRegistry) register(typeName string, rType reflect.Type, inserted
 	return true
 }
 
+func (r *packageRegistry) getType(name string) (reflect.Type, bool) {
+	e, ok := r.index[name]
+	if !ok {
+		return nil, false
+	}
+
+	return e.rType, true
+}
+
 func (r *registry) register(packageName, typeName string, rType reflect.Type, insertedAt time.Time) {
 	r.Lock()
 	defer r.Unlock()
 
 	index := r.packageRegistry(packageName)
 	if index.register(typeName, rType, insertedAt) {
+		if debugEnabled {
+			fmt.Printf("[DEBUG] overriding type %v, %v\n", strings.Join([]string{packageName, typeName}, "."), rType.String())
+		}
+
 		for _, notifier := range r.notifiers {
 			notifier(packageName, typeName, rType, insertedAt)
+		}
+	} else {
+		if debugEnabled {
+			fmt.Printf("[DEBUG] ignoring type override %v, types inserted before datly built are ignored\n", strings.Join([]string{packageName, typeName}, "."))
 		}
 	}
 }
