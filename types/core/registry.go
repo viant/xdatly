@@ -49,7 +49,7 @@ func (r *packageRegistry) register(typeName string, rType reflect.Type, inserted
 		return false
 	}
 
-	if anEntry.rType == rType || anEntry.inserted.After(insertedAt) {
+	if anEntry.inserted.After(insertedAt) {
 		return false
 	}
 
