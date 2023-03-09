@@ -1,4 +1,2 @@
-github.com/viant/xdatly/types/core v0.0.0-20230221181206-d2370898f2c4 h1:ulnZ0trBeVGWJU2fpy0cJPFTZBSwLBSy0fIHvcOqUvw=
-github.com/viant/xdatly/types/core v0.0.0-20230221181206-d2370898f2c4/go.mod h1:LJN2m8xJjtYNCvyvNrVanJwvzj8+hYCuPswL8H4qRG0=
-github.com/viant/xdatly/types/core v0.0.0-20230309034540-231985618fc7 h1:LFwWKGrmQskY6orkMw7f1WeQgoGgghjuB+7NlMchz5s=
-github.com/viant/xdatly/types/core v0.0.0-20230309034540-231985618fc7/go.mod h1:LJN2m8xJjtYNCvyvNrVanJwvzj8+hYCuPswL8H4qRG0=
+github.com/viant/xdatly/types/core v0.0.0-20230309221732-4dc744a54ac2 h1:BFfLa2cfMXuaIQcWiRe48H+Tu4t23k5Z+eCWNewS3bs=
+github.com/viant/xdatly/types/core v0.0.0-20230309221732-4dc744a54ac2/go.mod h1:LJN2m8xJjtYNCvyvNrVanJwvzj8+hYCuPswL8H4qRG0=
