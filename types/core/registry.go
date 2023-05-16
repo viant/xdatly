@@ -12,7 +12,42 @@ import (
 var debugEnabled = os.Getenv("DATLY_DEBUG") != ""
 
 func RegisterType(packageName, typeName string, rType reflect.Type, insertedAt time.Time) {
+	if rType.Kind() == reflect.Ptr {
+		rType = rType.Elem()
+	}
 	instance.register(packageName, typeName, rType, insertedAt)
+	if depTypes := getDependentTypes(rType); len(depTypes) > 0 { //dependent type are method call types that share the same package
+		for depType := range depTypes {
+			instance.register(packageName, typeName, depType, insertedAt)
+		}
+	}
+}
+
+func getDependentTypes(rType reflect.Type) map[reflect.Type]bool {
+	var depTypes = map[reflect.Type]bool{}
+	if rType.Kind() == reflect.Struct {
+		structPtr := reflect.PtrTo(rType)
+		discoverDependentTypes(rType, rType, depTypes)
+		discoverDependentTypes(structPtr, rType, depTypes)
+	}
+	return depTypes
+}
+
+func discoverDependentTypes(srcType reflect.Type, rType reflect.Type, dep map[reflect.Type]bool) {
+	for i := 0; i < srcType.NumMethod(); i++ {
+		method := srcType.Method(i)
+		for j := 0; j < method.Func.NumField(); j++ {
+			arg := method.Func.Field(j)
+			argType := arg.Type()
+			if argType.Kind() == reflect.Ptr {
+				argType = argType.Elem()
+			}
+			if argType.PkgPath() != rType.PkgPath() || argType == rType {
+				continue
+			}
+			dep[argType] = true
+		}
+	}
 }
 
 func Types(callback NotifierFn) (types map[string]map[string]reflect.Type, closeFn func()) {
