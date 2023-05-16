@@ -40,9 +40,9 @@ func getDependentTypes(rType reflect.Type) map[reflect.Type]bool {
 func discoverDependentTypes(srcType reflect.Type, rType reflect.Type, dep map[reflect.Type]bool) {
 	for i := 0; i < srcType.NumMethod(); i++ {
 		method := srcType.Method(i)
-		for j := 0; j < method.Func.NumField(); j++ {
-			arg := method.Func.Field(j)
-			argType := arg.Type()
+		fType := method.Func.Type()
+		for j := 0; j < fType.NumIn(); j++ {
+			argType := fType.In(j)
 			if argType.Kind() == reflect.Ptr {
 				argType = argType.Elem()
 			}
