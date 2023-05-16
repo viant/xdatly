@@ -18,7 +18,11 @@ func RegisterType(packageName, typeName string, rType reflect.Type, insertedAt t
 	instance.register(packageName, typeName, rType, insertedAt)
 	if depTypes := getDependentTypes(rType); len(depTypes) > 0 { //dependent type are method call types that share the same package
 		for depType := range depTypes {
-			instance.register(packageName, typeName, depType, insertedAt)
+			name := depType.Name()
+			if index := strings.LastIndex(name, "."); index != -1 {
+				name = name[index:]
+			}
+			instance.register(packageName, name, depType, insertedAt)
 		}
 	}
 }
