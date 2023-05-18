@@ -16,17 +16,16 @@ func RegisterType(packageName, typeName string, rType reflect.Type, insertedAt t
 		rType = rType.Elem()
 	}
 	instance.register(packageName, typeName, rType, insertedAt)
-	registerDependencies(packageName, rType, insertedAt)
 }
 
-func registerDependencies(packageName string, rType reflect.Type, insertedAt time.Time) {
+func registerDependencies(rType reflect.Type, insertedAt time.Time, index *packageRegistry) {
 	if depTypes := getDependentTypes(rType); len(depTypes) > 0 { //dependent type are method call types that share the same package
 		for depType := range depTypes {
 			name := depType.Name()
-			if index := strings.LastIndex(name, "."); index != -1 {
-				name = name[index:]
+			if dotPos := strings.LastIndex(name, "."); dotPos != -1 {
+				name = name[dotPos:]
 			}
-			instance.register(packageName, name, depType, insertedAt)
+			index.register(name, depType, insertedAt)
 		}
 	}
 }
@@ -47,8 +46,17 @@ func discoverDependentTypes(srcType reflect.Type, rType reflect.Type, dep map[re
 		fType := method.Func.Type()
 		for j := 0; j < fType.NumIn(); j++ {
 			argType := fType.In(j)
-			if argType.Kind() == reflect.Ptr {
+			switch argType.Kind() {
+			case reflect.Ptr:
 				argType = argType.Elem()
+			case reflect.Slice:
+				argType = argType.Elem()
+				if argType.Kind() == reflect.Ptr {
+					argType = argType.Elem()
+				}
+			}
+			if argType.Kind() != reflect.Struct {
+				continue
 			}
 			if argType.PkgPath() != rType.PkgPath() || argType == rType {
 				continue
@@ -132,7 +140,7 @@ func (r *registry) register(packageName, typeName string, rType reflect.Type, in
 		if debugEnabled {
 			fmt.Printf("[DEBUG] overriding type %v, %v\n", strings.Join([]string{packageName, typeName}, "."), rType.String())
 		}
-
+		registerDependencies(rType, insertedAt, index)
 		for _, notifier := range r.notifiers {
 			notifier(packageName, typeName, rType, insertedAt)
 		}
