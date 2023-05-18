@@ -16,16 +16,18 @@ func RegisterType(packageName, typeName string, rType reflect.Type, insertedAt t
 		rType = rType.Elem()
 	}
 	instance.register(packageName, typeName, rType, insertedAt)
+	registerDependencies(packageName, rType, insertedAt)
+
 }
 
-func registerDependencies(rType reflect.Type, insertedAt time.Time, index *packageRegistry) {
+func registerDependencies(packageName string, rType reflect.Type, insertedAt time.Time) {
 	if depTypes := getDependentTypes(rType); len(depTypes) > 0 { //dependent type are method call types that share the same package
 		for depType := range depTypes {
 			name := depType.Name()
 			if dotPos := strings.LastIndex(name, "."); dotPos != -1 {
 				name = name[dotPos:]
 			}
-			index.register(name, depType, insertedAt)
+			instance.register(packageName, name, depType, insertedAt)
 		}
 	}
 }
@@ -140,7 +142,6 @@ func (r *registry) register(packageName, typeName string, rType reflect.Type, in
 		if debugEnabled {
 			fmt.Printf("[DEBUG] overriding type %v, %v\n", strings.Join([]string{packageName, typeName}, "."), rType.String())
 		}
-		registerDependencies(rType, insertedAt, index)
 		for _, notifier := range r.notifiers {
 			notifier(packageName, typeName, rType, insertedAt)
 		}
