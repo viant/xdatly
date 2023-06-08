@@ -16,9 +16,3 @@ type Session interface {
 	Response() response.Response
 	StateInto(dest interface{}) error
 }
-
-/*
-	{"ViewHandler":"Foo"}
-
-
-*/
