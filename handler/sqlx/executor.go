@@ -2,7 +2,7 @@ package sqlx
 
 type Executor interface {
 	Flusher
-	Execute(DML string) error
+	Execute(DML string, options ...ExecutorOption) error
 }
 
 type ExecutorOptions struct {
