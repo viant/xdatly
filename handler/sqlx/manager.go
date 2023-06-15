@@ -16,7 +16,7 @@ type Sqlx interface {
 	Reader
 	Db(ctx context.Context) (*sql.DB, error)
 	Tx(ctx context.Context) (*sql.Tx, error)
-	Validator() validator.Service
+	Validator() *validator.Service
 }
 
 type Service struct {
