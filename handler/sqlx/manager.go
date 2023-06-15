@@ -23,8 +23,8 @@ type Service struct {
 	sqlx Sqlx
 }
 
-func (s Service) Load(tableName string, data interface{}) error {
-	return s.sqlx.Load(tableName, data)
+func (s Service) Load(ctx context.Context, tableName string, data interface{}) error {
+	return s.sqlx.Load(ctx, tableName, data)
 }
 
 func (s Service) Allocate(ctx context.Context, tableName string, dest interface{}, selector string) error {

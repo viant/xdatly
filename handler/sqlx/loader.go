@@ -1,6 +1,8 @@
 package sqlx
 
+import "context"
+
 type Loader interface {
 	Flusher
-	Load(tableName string, data interface{}) error
+	Load(ctx context.Context, tableName string, data interface{}) error
 }
