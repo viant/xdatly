@@ -63,7 +63,7 @@ func (s Service) Tx(ctx context.Context) (*sql.Tx, error) {
 	return s.sqlx.Tx(ctx)
 }
 
-func (s Service) Validator() validator.Service {
+func (s Service) Validator() *validator.Service {
 	return s.sqlx.Validator()
 }
 
