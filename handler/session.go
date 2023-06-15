@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/viant/xdatly/handler/differ"
+	"github.com/viant/xdatly/handler/logger"
 	"github.com/viant/xdatly/handler/mbus"
 	"github.com/viant/xdatly/handler/sqlx"
 	"github.com/viant/xdatly/handler/state"
@@ -14,6 +15,7 @@ type ISession interface {
 	MessageBus() *mbus.Service
 	Db(opts ...sqlx.Option) *sqlx.Service
 	Stater() *state.Service
+	Logger() *logger.Service
 }
 
 type Session struct {

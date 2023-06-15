@@ -24,53 +24,43 @@ type Service struct {
 }
 
 func (s Service) Allocate(ctx context.Context, tableName string, dest interface{}, selector string) error {
-	//TODO implement me
-	panic("implement me")
+	return s.Allocate(ctx, tableName, dest, selector)
 }
 
 func (s Service) Flush(ctx context.Context, tableName string) error {
-	//TODO implement me
-	panic("implement me")
+	return s.sqlx.Flush(ctx, tableName)
 }
 
 func (s Service) Insert(tableName string, data interface{}) error {
-	//TODO implement me
-	panic("implement me")
+	return s.sqlx.Insert(tableName, data)
 }
 
 func (s Service) Update(tableName string, data interface{}) error {
-	//TODO implement me
-	panic("implement me")
+	return s.sqlx.Update(tableName, data)
 }
 
 func (s Service) Delete(tableName string, data interface{}) error {
-	//TODO implement me
-	panic("implement me")
+	return s.sqlx.Delete(tableName, data)
 }
 
 func (s Service) Execute(DML string, options ...ExecutorOption) error {
-	//TODO implement me
-	panic("implement me")
+	return s.sqlx.Execute(DML, options...)
 }
 
 func (s Service) Read(ctx context.Context, dest interface{}, SQL string, params ...interface{}) error {
-	//TODO implement me
-	panic("implement me")
+	return s.sqlx.Read(ctx, dest, SQL, params)
 }
 
 func (s Service) Db(ctx context.Context) (*sql.DB, error) {
-	//TODO implement me
-	panic("implement me")
+	return s.sqlx.Db(ctx)
 }
 
 func (s Service) Tx(ctx context.Context) (*sql.Tx, error) {
-	//TODO implement me
-	panic("implement me")
+	return s.sqlx.Tx(ctx)
 }
 
 func (s Service) Validator() validator.Service {
-	//TODO implement me
-	panic("implement me")
+	return s.sqlx.Validator()
 }
 
 func New(sqlx Sqlx) *Service {
