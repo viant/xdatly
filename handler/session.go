@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"github.com/viant/xdatly/handler/differ"
 	"github.com/viant/xdatly/handler/mbus"
 	"github.com/viant/xdatly/handler/sqlx"
@@ -14,4 +15,5 @@ type Session interface {
 	MessageBus() *mbus.Service
 	Db(opts ...sqlx.Option) *sqlx.Service
 	Stater() *state.Service
+	FlushTemplate(ctx context.Context) error
 }
