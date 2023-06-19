@@ -13,7 +13,7 @@ type Session interface {
 	Validator() *validator.Service
 	Differ() *differ.Service
 	MessageBus() *mbus.Service
-	Db(opts ...sqlx.Option) *sqlx.Service
+	Db(opts ...sqlx.Option) (*sqlx.Service, error)
 	Stater() *state.Service
 	FlushTemplate(ctx context.Context) error
 }
