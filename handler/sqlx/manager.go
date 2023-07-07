@@ -28,7 +28,7 @@ func (s Service) Load(ctx context.Context, tableName string, data interface{}) e
 }
 
 func (s Service) Allocate(ctx context.Context, tableName string, dest interface{}, selector string) error {
-	return s.Allocate(ctx, tableName, dest, selector)
+	return s.sqlx.Allocate(ctx, tableName, dest, selector)
 }
 
 func (s Service) Flush(ctx context.Context, tableName string) error {
