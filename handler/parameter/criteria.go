@@ -7,7 +7,12 @@ import (
 
 type (
 	CriteriaBuilder interface {
-		BuildCriteria(ctx context.Context, value interface{}, options *Options) error
+		BuildCriteria(ctx context.Context, value interface{}, options *Options) (*Criteria, error)
+	}
+
+	Criteria struct {
+		Query string
+		Args  []interface{}
 	}
 
 	Options struct {
@@ -32,7 +37,6 @@ type (
 	}
 
 	Selector interface {
-		SetCriteria(query string, args []interface{})
 		IgnoreRead()
 	}
 )
