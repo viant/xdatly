@@ -1,12 +1,13 @@
 package codec
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
 
 type (
-	registry struct {
+	Registry struct {
 		sync.Mutex
 		registry  map[string]*Codec
 		notifiers map[int64]func(codec *Codec)
@@ -19,30 +20,44 @@ type (
 		Factory            Factory
 		factoryInsertedAt  time.Time
 	}
+
+	Option func(registry *Registry)
 )
 
-var registryInstance = newRegistryInstance()
+func WithFactory(name string, factory Factory, at time.Time) Option {
+	return func(registry *Registry) {
+		registry.RegisterFactory(name, factory, at)
+	}
+}
+
+func WithCodec(name string, codec Instance, at time.Time) Option {
+	return func(registry *Registry) {
+		registry.RegisterInstance(name, codec, at)
+	}
+}
+
+var registryInstance = NewRegistry()
 
 func Codecs(notifier func(codec *Codec)) (codecs map[string]*Codec, closer func()) {
-	return registryInstance.codecs(notifier)
+	return registryInstance.Codecs(notifier)
 }
 
 func RegisterCodec(name string, codec Instance, at time.Time) {
-	registryInstance.registerInstance(name, codec, at)
+	registryInstance.RegisterInstance(name, codec, at)
 }
 
 func RegisterFactory(name string, factory Factory, at time.Time) {
-	registryInstance.registerFactory(name, factory, at)
+	registryInstance.RegisterFactory(name, factory, at)
 }
 
-func newRegistryInstance() *registry {
-	return &registry{
+func NewRegistry(opts ...Option) *Registry {
+	return &Registry{
 		registry:  map[string]*Codec{},
 		notifiers: map[int64]func(codec *Codec){},
 	}
 }
 
-func (r *registry) codecs(notifier func(codec *Codec)) (map[string]*Codec, func()) {
+func (r *Registry) Codecs(notifier func(codec *Codec)) (map[string]*Codec, func()) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -65,7 +80,7 @@ func (r *registry) codecs(notifier func(codec *Codec)) (map[string]*Codec, func(
 	return result, closer
 }
 
-func (r *registry) registerFactory(name string, factory Factory, at time.Time) {
+func (r *Registry) RegisterFactory(name string, factory Factory, at time.Time) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -74,7 +89,7 @@ func (r *registry) registerFactory(name string, factory Factory, at time.Time) {
 	r.notify(codec)
 }
 
-func (r *registry) registerInstance(name string, instance Instance, at time.Time) {
+func (r *Registry) RegisterInstance(name string, instance Instance, at time.Time) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -83,7 +98,7 @@ func (r *registry) registerInstance(name string, instance Instance, at time.Time
 	r.notify(codec)
 }
 
-func (r *registry) getCodec(name string) *Codec {
+func (r *Registry) getCodec(name string) *Codec {
 	codec, ok := r.registry[name]
 	if !ok {
 		codec = &Codec{}
@@ -93,7 +108,19 @@ func (r *registry) getCodec(name string) *Codec {
 	return codec
 }
 
-func (r *registry) key() int64 {
+func (r *Registry) Lookup(name string) (*Codec, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	codec, ok := r.registry[name]
+	if !ok {
+		return nil, fmt.Errorf("not found codec %v", name)
+	}
+
+	return codec, nil
+}
+
+func (r *Registry) key() int64 {
 	now := time.Now().Unix()
 	for {
 		if _, ok := r.notifiers[now]; ok {
@@ -104,7 +131,7 @@ func (r *registry) key() int64 {
 	}
 }
 
-func (r *registry) notify(codec *Codec) {
+func (r *Registry) notify(codec *Codec) {
 	for _, f := range r.notifiers {
 		f(codec)
 	}
