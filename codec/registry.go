@@ -55,10 +55,16 @@ func Register(name string, codec *Codec) {
 }
 
 func NewRegistry(opts ...Option) *Registry {
-	return &Registry{
+	r := &Registry{
 		registry:  map[string]*Codec{},
 		notifiers: map[int64]func(codec *Codec){},
 	}
+
+	for _, opt := range opts {
+		opt(r)
+	}
+
+	return r
 }
 
 func (r *Registry) Codecs(notifier func(codec *Codec)) (map[string]*Codec, func()) {
