@@ -3,13 +3,14 @@ package predicate
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
 type (
 	registry struct {
-		lock     sync.Mutex
-		notifier NotifierFn
-		registry map[string]*Template
+		sync.Mutex
+		notifiers map[int64]NotifierFn
+		registry  map[string]*Template
 	}
 	NotifierFn func(template *Template)
 )
@@ -25,34 +26,59 @@ func (r *registry) Lookup(name string) (*Template, error) {
 var instance *registry
 
 func init() {
-	instance = &registry{registry: map[string]*Template{}}
-	RegisterTemplate(&Template{Name: "exists",
-		Source: `
- EXISTS (SELECT 1 FROM $Table t WHERE t.$Column = $FilterValue AND t.$JoinColumn = p.$ParentColumn) 
-`,
-		Args: []*NamedArgument{
-			{Name: "Table", Position: 0},
-			{Name: "Column", Position: 1},
-			{Name: "JoinColumn", Position: 2},
-			{Name: "ParentColumn", Position: 3},
-		}})
+	instance = &registry{registry: map[string]*Template{}, notifiers: map[int64]NotifierFn{}}
 }
 
 func RegisterTemplate(template *Template) {
-	instance.registry[template.Name] = template
-	if instance.notifier != nil {
-		instance.notifier(template)
+	instance.register(template)
+}
+
+func Templates(callback NotifierFn) (types map[string]*Template, closer func()) {
+	return instance.templates(callback)
+}
+
+func (r *registry) register(template *Template) {
+	r.Lock()
+	defer r.Unlock()
+
+	r.registry[template.Name] = template
+	for _, fn := range r.notifiers {
+		fn(template)
 	}
 }
 
-func Templates(callback NotifierFn) (types map[string]*Template) {
-	instance.lock.Lock()
-	defer instance.lock.Unlock()
-	instance.notifier = callback
+func (r *registry) templates(callback NotifierFn) (map[string]*Template, func()) {
+	r.Lock()
+	defer r.Unlock()
+
 	result := map[string]*Template{}
-	for _, template := range instance.registry {
+	for _, template := range r.registry {
 		result[template.Name] = template
 	}
 
-	return instance.registry
+	var closer func()
+	if callback != nil {
+		key := r.key()
+
+		r.notifiers[key] = callback
+		closer = func() {
+			r.Lock()
+			defer r.Unlock()
+			delete(r.notifiers, key)
+		}
+	}
+
+	return result, closer
+
+}
+
+func (r *registry) key() int64 {
+	now := time.Now().Unix()
+	for {
+		if _, ok := r.notifiers[now]; ok {
+			now++
+		} else {
+			return now
+		}
+	}
 }
