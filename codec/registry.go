@@ -16,9 +16,9 @@ type (
 	Codec struct {
 		Name               string
 		Instance           Instance
-		instanceInsertedAt time.Time
+		InstanceInsertedAt time.Time
 		Factory            Factory
-		factoryInsertedAt  time.Time
+		FactoryInsertedAt  time.Time
 	}
 
 	Option func(registry *Registry)
@@ -50,6 +50,10 @@ func RegisterFactory(name string, factory Factory, at time.Time) {
 	registryInstance.RegisterFactory(name, factory, at)
 }
 
+func Register(name string, codec *Codec) {
+	registryInstance.RegisterCodec(name, codec)
+}
+
 func NewRegistry(opts ...Option) *Registry {
 	return &Registry{
 		registry:  map[string]*Codec{},
@@ -78,6 +82,13 @@ func (r *Registry) Codecs(notifier func(codec *Codec)) (map[string]*Codec, func(
 	}
 
 	return result, closer
+}
+
+func (r *Registry) RegisterCodec(name string, codec *Codec) {
+	r.Lock()
+	defer r.Unlock()
+	r.registry[name] = codec
+	r.notify(codec)
 }
 
 func (r *Registry) RegisterFactory(name string, factory Factory, at time.Time) {
