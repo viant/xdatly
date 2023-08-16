@@ -16,6 +16,13 @@ func (o *Options) Apply(opts []Option) {
 	}
 }
 
+// NewOptions creates an options
+func NewOptions(opts []Option) *Options {
+	options := &Options{}
+	options.Apply(opts)
+	return options
+}
+
 // Option func to set options
 type Option func(o *Options)
 
