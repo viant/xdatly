@@ -21,16 +21,16 @@ type (
 		FactoryInsertedAt  time.Time
 	}
 
-	Option func(registry *Registry)
+	RegistryOption func(registry *Registry)
 )
 
-func WithFactory(name string, factory Factory, at time.Time) Option {
+func WithFactory(name string, factory Factory, at time.Time) RegistryOption {
 	return func(registry *Registry) {
 		registry.RegisterFactory(name, factory, at)
 	}
 }
 
-func WithCodec(name string, codec Instance, at time.Time) Option {
+func WithCodec(name string, codec Instance, at time.Time) RegistryOption {
 	return func(registry *Registry) {
 		registry.RegisterInstance(name, codec, at)
 	}
@@ -54,7 +54,7 @@ func Register(name string, codec *Codec) {
 	registryInstance.RegisterCodec(name, codec)
 }
 
-func NewRegistry(opts ...Option) *Registry {
+func NewRegistry(opts ...RegistryOption) *Registry {
 	r := &Registry{
 		registry:  map[string]*Codec{},
 		notifiers: map[int64]func(codec *Codec){},
