@@ -1,12 +1,15 @@
 package codec
 
-import "reflect"
+import (
+	"context"
+	"reflect"
+)
 
 // Options represents codec options
 type Options struct {
 	LookupType  func(name string) (reflect.Type, error)
 	Record      interface{}
-	LookupValue func(name string) (interface{}, bool)
+	LookupValue func(ctx context.Context, name string) (interface{}, error)
 	Options     []interface{}
 }
 
@@ -41,7 +44,7 @@ func WithRecord(record interface{}) Option {
 }
 
 // WithValueLookup creates value lookup option
-func WithValueLookup(fn func(name string) (interface{}, bool)) Option {
+func WithValueLookup(fn func(ctx context.Context, name string) (interface{}, error)) Option {
 	return func(o *Options) {
 		o.LookupValue = fn
 	}
