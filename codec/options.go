@@ -10,7 +10,7 @@ type Options struct {
 	Options     []interface{}
 }
 
-func (o *Options) Apply(opts ...Option) {
+func (o *Options) Apply(opts []Option) {
 	for _, opt := range opts {
 		opt(o)
 	}
