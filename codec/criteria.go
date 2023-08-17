@@ -1,4 +1,4 @@
-package parameter
+package codec
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 
 type (
 	CriteriaBuilder interface {
-		BuildCriteria(ctx context.Context, value interface{}, options *Options) (*Criteria, error)
+		BuildCriteria(ctx context.Context, value interface{}, options *CriteriaBuilderOptions) (*Criteria, error)
 	}
 
 	Criteria struct {
@@ -15,7 +15,7 @@ type (
 		Args  []interface{}
 	}
 
-	Options struct {
+	CriteriaBuilderOptions struct {
 		Columns    ColumnsSource
 		Parameters ValueGetter
 		Selector   Selector

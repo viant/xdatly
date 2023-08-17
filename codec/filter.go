@@ -1,4 +1,4 @@
-package parameter
+package codec
 
 // Filter represents predicate filter
 type Filter struct {

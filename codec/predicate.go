@@ -1,4 +1,4 @@
-package parameter
+package codec
 
 type (
 	Predicate struct {
