@@ -31,18 +31,18 @@ type (
 	CreateDisposition string
 	WriteDisposition  string
 
-	Record struct {
-		Metadata *RecordMetadata
-		Record   *DbRecord
+	JobWithMeta struct {
+		Metadata *JobMetadata
+		Record   *Job
 	}
 
-	RecordMetadata struct {
+	JobMetadata struct {
 		CacheHit bool
 	}
 
-	DbRecord struct {
+	Job struct {
 		JobID   string `sqlx:"primaryKey=true,name=JobID" json:",omitempty"`
-		State   State  `json:",omitempty"`
+		State   State  `sqlx:"name=State" json:",omitempty"`
 		Metrics string `json:",omitempty"`
 		RecordRequest
 		RecordPrincipal
@@ -54,7 +54,7 @@ type (
 		CreationTime time.Time      `json:",omitempty"`
 		EndTime      *time.Time     `json:",omitempty"`
 		TimeTaken    *time.Duration `json:",omitempty"`
-		SQL          []*SQL         `sqlx:"enc=JSON"`
+		SQL          []*SQL         `sqlx:"enc=JSON,name=SQLQuery" sqlxAsync:"enc=JSON,name=SQLQuery"`
 	}
 
 	RecordRequest struct {
@@ -70,6 +70,8 @@ type (
 	}
 
 	RecordDestination struct {
+		DestinationConnector         string            `json:",omitempty"`
+		DestinationDataset           string            `json:",omitempty"`
 		DestinationTable             string            `json:",omitempty"`
 		DestinationCreateDisposition CreateDisposition `json:",omitempty"`
 		DestinationSchema            *string           `json:",omitempty"`

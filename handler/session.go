@@ -18,7 +18,7 @@ type Session interface {
 	Db(opts ...sqlx.Option) (*sqlx.Service, error)
 	Stater() *state.Service
 	FlushTemplate(ctx context.Context) error
-	Redirect(route *http.Route) (Session, error)
+	Route(ctx context.Context, route *http.Route) (Session, error)
 	Http() http.Http
 	Async() async.Async
 }
