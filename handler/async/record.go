@@ -77,6 +77,8 @@ type (
 		DestinationSchema            *string           `json:",omitempty"`
 		DestinationTemplate          *string           `json:",omitempty"`
 		DestinationWriteDisposition  *WriteDisposition `json:",omitempty"`
+		DestinationBucketURL         string            `json:",omitempty"`
+		DestinationQueueName         string            `json:",omitempty"`
 	}
 
 	SQL struct {

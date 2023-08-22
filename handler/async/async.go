@@ -14,7 +14,7 @@ const (
 type (
 	HandlerType string
 	Async       interface {
-		Read(ctx context.Context, config *Config, options ...ReadOption) (*JobWithMeta, error)
+		Read(ctx context.Context, options ...ReadOption) (*JobWithMeta, error)
 		ReadInto(ctx context.Context, dst interface{}, job *Job, connector string) error
 	}
 
