@@ -2,6 +2,7 @@ package async
 
 import (
 	"context"
+	"reflect"
 	"time"
 )
 
@@ -14,6 +15,7 @@ const (
 type (
 	HandlerType string
 	Async       interface {
+		Type() reflect.Type
 		Read(ctx context.Context, options ...ReadOption) (*JobWithMeta, error)
 		ReadInto(ctx context.Context, dst interface{}, job *Job, connector string) error
 	}
@@ -51,7 +53,7 @@ func WithConnector(name string) ReadOption {
 	}
 }
 
-func WithRecord(record *Job) ReadOption {
+func WithJob(record *Job) ReadOption {
 	return func(options *ReadOptions) {
 		options.Job = record
 	}

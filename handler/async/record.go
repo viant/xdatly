@@ -33,7 +33,7 @@ type (
 
 	JobWithMeta struct {
 		Metadata *JobMetadata
-		Record   *Job
+		Job      *Job
 	}
 
 	JobMetadata struct {
