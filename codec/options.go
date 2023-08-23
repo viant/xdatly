@@ -12,6 +12,7 @@ type Options struct {
 	LookupValue func(ctx context.Context, name string) (interface{}, error)
 	ColumnsSource
 	Selector
+	ValueGetter
 	Options []interface{}
 }
 
@@ -63,6 +64,13 @@ func WithRecord(record interface{}) Option {
 func WithValueLookup(fn func(ctx context.Context, name string) (interface{}, error)) Option {
 	return func(o *Options) {
 		o.LookupValue = fn
+	}
+}
+
+// WithValueGetter creates value gettter options
+func WithValueGetter(option ValueGetter) Option { //TODO replace with LookupValue
+	return func(o *Options) {
+		o.ValueGetter = option
 	}
 }
 
