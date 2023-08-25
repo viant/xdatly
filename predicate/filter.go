@@ -1,6 +1,6 @@
-package codec
+package predicate
 
-// Filter represents predicate filter
+// Filter represents predicate instance
 type Filter struct {
 	Name    string
 	Tag     string
