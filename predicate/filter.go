@@ -1,9 +1,11 @@
 package predicate
 
+import "reflect"
+
 // Filter represents predicate instance
 type Filter struct {
 	Name    string
-	Tag     string
+	Tag     reflect.StructTag
 	Include interface{}
 	Exclude interface{}
 }
