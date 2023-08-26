@@ -1,7 +1,5 @@
 package response
 
-import "github.com/viant/xdatly/handler/validator"
-
 type (
 	Warning struct {
 		Message string `json:",omitempty"`
@@ -10,7 +8,7 @@ type (
 	Status struct {
 		Status  string                 `json:",omitempty"`
 		Message string                 `json:",omitempty"`
-		Errors  []*validator.Violation `json:",omitempty"`
+		Errors  interface{}            `json:",omitempty"`
 		Warning []*Warning             `json:",omitempty"`
 		Extras  map[string]interface{} `json:",omitempty" default:"embedded=true"`
 	}
