@@ -8,12 +8,10 @@ import (
 type (
 	//Violation represent validation violation
 	Violation struct {
-		Code     string      `json:",omitempty"`
 		Location string      `json:",omitempty"`
 		Field    string      `json:",omitempty"`
 		Value    interface{} `json:",omitempty"`
 		Message  string      `json:",omitempty"`
-		Detail   string      `json:",omitempty"`
 		Check    string      `json:",omitempty"`
 	}
 
