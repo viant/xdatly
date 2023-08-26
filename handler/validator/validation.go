@@ -8,21 +8,23 @@ import (
 type (
 	//Violation represent validation violation
 	Violation struct {
-		Location string
-		Field    string
-		Value    interface{}
-		Message  string
-		Check    string
+		Code     string      `json:",omitempty"`
+		Location string      `json:",omitempty"`
+		Field    string      `json:",omitempty"`
+		Value    interface{} `json:",omitempty"`
+		Message  string      `json:",omitempty"`
+		Detail   string      `json:",omitempty"`
+		Check    string      `json:",omitempty"`
 	}
 
 	//Validation represents validation
 	Validation struct {
-		Violations []*Violation
-		Failed     bool
+		Violations []*Violation `json:",omitempty"`
+		Failed     bool         `json:",omitempty"`
 	}
 )
 
-//Append appends violation
+// Append appends violation
 func (v *Validation) Append(location, field string, value interface{}, check string, msg string) {
 	if msg == "" {
 		msg = fmt.Sprintf("check '%v' failed on field %v", check, field)
@@ -39,7 +41,7 @@ func (v *Validation) Append(location, field string, value interface{}, check str
 	v.Failed = len(v.Violations) > 0
 }
 
-//AddViolation adds violation
+// AddViolation adds violation
 func (v *Validation) AddViolation(location, field string, value interface{}, check string, msg string) {
 	v.Append(location, field, value, check, msg)
 }
