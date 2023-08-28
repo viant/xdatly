@@ -1,40 +1,16 @@
 package predicate
 
-import "reflect"
-
-// Filter represents predicate instance
-type Filter struct {
-	Name    string
-	Tag     reflect.StructTag
-	Include interface{}
-	Exclude interface{}
+type StringsFilter struct {
+	Include []string
+	Exclude []string
 }
 
-// Filters represents a filter collection
-type Filters []*Filter
-
-// Lookup lookups filter
-func (f *Filters) Lookup(name string) *Filter {
-	for _, candidate := range *f {
-		if name == candidate.Name {
-			return candidate
-		}
-	}
-	return nil
+type IntFilter struct {
+	Include []int
+	Exclude []int
 }
 
-// Add adds filter with provided name
-func (f *Filters) Add(name string) *Filter {
-	ret := &Filter{Name: name}
-	*f = append(*f, ret)
-	return ret
-}
-
-// LookupOrAdd lookup or add filter for specified name
-func (f *Filters) LookupOrAdd(name string) *Filter {
-	ret := f.Lookup(name)
-	if ret == nil {
-		ret = f.Add(name)
-	}
-	return ret
+type BoolFilter struct {
+	Include []bool
+	Exclude []bool
 }
