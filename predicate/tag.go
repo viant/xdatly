@@ -14,6 +14,23 @@ type (
 	}
 )
 
+func (t *Tag) NormalizedName(name string) string {
+	if t.Name != "" {
+		return t.Name
+	}
+	toLower := strings.ToLower(name)
+	if strings.HasSuffix(toLower, "excl") {
+		t.Name = name[:len(name)-4]
+	} else if strings.HasSuffix(toLower, "exclusion") {
+		t.Name = name[:len(name)-9]
+	} else if strings.HasSuffix(toLower, "incl") {
+		t.Name = name[:len(name)-4]
+	} else if strings.HasSuffix(toLower, "inclusion") {
+		t.Name = name[:len(name)-9]
+	}
+	return t.Name
+}
+
 // ParseTag parses predicate tag
 func ParseTag(tag string) *Tag {
 	ret := &Tag{}
