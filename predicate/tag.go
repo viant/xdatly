@@ -28,6 +28,9 @@ func (t *Tag) NormalizedName(name string) string {
 	} else if strings.HasSuffix(toLower, "inclusion") {
 		t.Name = name[:len(name)-9]
 	}
+	if t.Name == "" {
+		t.Name = name
+	}
 	return t.Name
 }
 
