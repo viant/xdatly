@@ -11,8 +11,8 @@ type (
 	}
 
 	Criteria struct {
-		Predicate string
-		Args      []interface{}
+		Expression   string
+		Placeholders []interface{}
 	}
 
 	CriteriaBuilderOptions struct {

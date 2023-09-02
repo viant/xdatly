@@ -125,5 +125,5 @@ func AsString(src any) ([]byte, error) {
 		return rValue.Convert(bytesType).Bytes(), nil
 	}
 
-	return nil, fmt.Errorf("unsupported Args database type, expected []byte/string got %T", src)
+	return nil, fmt.Errorf("unsupported Placeholders database type, expected []byte/string got %T", src)
 }
