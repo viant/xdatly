@@ -5,7 +5,7 @@ type (
 		Message string `json:",omitempty"`
 		Reason  string `json:",omitempty"`
 	}
-	Status struct {
+	ResponseStatus struct {
 		Status  string                 `json:",omitempty"`
 		Message string                 `json:",omitempty"`
 		Errors  interface{}            `json:",omitempty"`
