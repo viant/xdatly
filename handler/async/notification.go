@@ -10,7 +10,7 @@ type (
 	NotificationMethod string
 
 	Notification struct {
-		HandlerType NotificationMethod
+		Method      NotificationMethod
 		Destination string
 	}
 )
