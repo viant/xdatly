@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"github.com/viant/xdatly/handler/async"
 	"github.com/viant/xdatly/handler/differ"
 	"github.com/viant/xdatly/handler/http"
 	"github.com/viant/xdatly/handler/mbus"
@@ -20,5 +19,4 @@ type Session interface {
 	FlushTemplate(ctx context.Context) error
 	Route(ctx context.Context, route *http.Route) (Session, error)
 	Http() http.Http
-	Async() async.Async
 }
