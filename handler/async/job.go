@@ -16,9 +16,6 @@ type (
 		JobID   string `sqlx:"primaryKey=true,name=JobID" json:",omitempty"`
 		Status  string `sqlx:"name=Status" json:",omitempty"`
 		Metrics string `json:",omitempty"`
-		Method  string `json:",omitempty"`
-		URI     string `json:",omitempty"`
-		State   string `json:",omitempty"`
 		destination.Table
 		destination.Cache
 		Request
@@ -41,7 +38,7 @@ type (
 
 	Principal struct {
 		UserEmail *string `json:",omitempty"`
-		Subject   *string `json:",omitempty"`
+		UserID    *string `json:",omitempty"`
 	}
 
 	SQL struct {
