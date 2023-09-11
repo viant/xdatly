@@ -47,7 +47,12 @@ type (
 	}
 
 	QueryArgs []interface{}
+
+	jobKey string
 )
+
+// JobKey defines context job key
+var JobKey = jobKey("job")
 
 func (q QueryArgs) Value() (driver.Value, error) {
 	marshal, err := json.Marshal(q)
