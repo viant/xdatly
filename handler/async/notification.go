@@ -3,7 +3,6 @@ package async
 const (
 	NotificationMethodStorage    NotificationMethod = "Storage"
 	NotificationMethodMessageBus NotificationMethod = "MessageBus"
-	NotificationMethodChannel    NotificationMethod = "Channel"
 	NotificationMethodUndefined  NotificationMethod = ""
 )
 
