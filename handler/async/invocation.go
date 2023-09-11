@@ -1,8 +1,8 @@
 package async
 
 const (
-	InvocationTypeEvent     = "event"
-	InvocationTypeUndefined = ""
+	InvocationTypeEvent     InvocationType = "event"
+	InvocationTypeUndefined InvocationType = ""
 )
 
 type (
