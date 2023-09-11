@@ -23,6 +23,7 @@ type (
 		MainView     string         `json:",omitempty" sqlx:"MainView"`
 		Labels       string         `json:",omitempty"`
 		JobType      string         `json:",omitempty"`
+		EventURL     string         `json:",omitempty"`
 		Error        *string        `json:",omitempty"`
 		CreationTime time.Time      `json:",omitempty"`
 		EndTime      *time.Time     `json:",omitempty"`
