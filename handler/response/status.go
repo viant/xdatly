@@ -16,13 +16,13 @@ type (
 	}
 
 	JobStatus struct {
-		RequestTime time.Time
-		JobStatus   string
-		CreateTime  time.Time
-		WaitTimeMcs int
-		RunTimeMcs  int
-		ExpiryInSec int
-		CacheKey    string
-		CacheHit    bool
+		RequestTime time.Time `json:",omitempty"`
+		JobStatus   string    `json:",omitempty"`
+		CreateTime  time.Time `json:",omitempty"`
+		WaitTimeMcs int       `json:",omitempty"`
+		RunTimeMcs  int       `json:",omitempty"`
+		ExpiryInSec int       `json:",omitempty"`
+		CacheKey    string    `json:",omitempty"`
+		CacheHit    bool      `json:",omitempty"`
 	}
 )
