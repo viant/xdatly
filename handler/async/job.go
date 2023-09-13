@@ -33,6 +33,7 @@ type (
 		WaitTimeMcs  int        `json:",omitempty"`
 		RunTimeMcs   int        `json:",omitempty"`
 		SQL          []*SQL     `sqlx:"enc=JSON,name=SQLQuery" sqlxAsync:"enc=JSON,name=SQLQuery"`
+		Invalidated  bool       `json:",omitempty"`
 	}
 
 	Request struct {
