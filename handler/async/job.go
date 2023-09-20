@@ -13,10 +13,10 @@ var bytesType = reflect.TypeOf([]byte{})
 
 type (
 	Job struct {
-		ID      string `sqlx:"primaryKey=true,name=ID" json:",omitempty"`
-		Ref     string `json:",omitempty"`
-		Status  string `sqlx:"name=Status" json:",omitempty"`
-		Metrics string `json:",omitempty"`
+		ID       string `sqlx:"primaryKey=true,name=ID" json:",omitempty"`
+		MatchKey string `json:",omitempty"`
+		Status   string `sqlx:"name=Status" json:",omitempty"`
+		Metrics  string `json:",omitempty"`
 		destination.Table
 		destination.Cache
 		Request

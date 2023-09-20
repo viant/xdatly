@@ -24,5 +24,6 @@ type (
 		ExpiryInSec int       `json:",omitempty"`
 		CacheKey    string    `json:",omitempty"`
 		CacheHit    bool      `json:",omitempty"`
+		MatchKey    string    `json:",omitempty"`
 	}
 )
