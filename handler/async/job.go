@@ -21,19 +21,19 @@ type (
 		destination.Cache
 		Request
 		Principal
-		MainView     string     `json:",omitempty" sqlx:"MainView"`
-		Labels       string     `json:",omitempty"`
-		JobType      string     `json:",omitempty"`
-		EventURL     string     `json:",omitempty"`
-		Error        *string    `json:",omitempty"`
-		CreationTime time.Time  `json:",omitempty"`
-		StartTime    *time.Time `json:",omitempty"`
-		EndTime      *time.Time `json:",omitempty"`
-		ExpiryTime   *time.Time `json:",omitempty"`
-		WaitTimeMcs  int        `json:",omitempty"`
-		RunTimeMcs   int        `json:",omitempty"`
-		SQL          []*SQL     `sqlx:"enc=JSON,name=SQLQuery" sqlxAsync:"enc=JSON,name=SQLQuery"`
-		Invalidated  bool       `json:",omitempty"`
+		MainView      string     `json:",omitempty" sqlx:"MainView"`
+		Labels        string     `json:",omitempty"`
+		JobType       string     `json:",omitempty"`
+		EventURL      string     `json:",omitempty"`
+		Error         *string    `json:",omitempty"`
+		CreationTime  time.Time  `json:",omitempty"`
+		StartTime     *time.Time `json:",omitempty"`
+		EndTime       *time.Time `json:",omitempty"`
+		ExpiryTime    *time.Time `json:",omitempty"`
+		WaitTimeInMcs int        `json:",omitempty"`
+		RunTimeInMcs  int        `json:",omitempty"`
+		SQL           []*SQL     `sqlx:"enc=JSON,name=SQLQuery" sqlxAsync:"enc=JSON,name=SQLQuery"`
+		Deactivated   bool       `json:",omitempty"`
 	}
 
 	Request struct {
