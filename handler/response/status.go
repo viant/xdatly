@@ -15,7 +15,7 @@ type (
 		Extras  map[string]interface{} `json:",omitempty" default:"embedded=true"`
 	}
 
-	JobStatus struct {
+	JobInfo struct {
 		RequestTime time.Time `json:",omitempty"`
 		JobStatus   string    `json:",omitempty"`
 		CreateTime  time.Time `json:",omitempty"`
