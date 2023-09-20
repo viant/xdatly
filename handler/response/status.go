@@ -27,11 +27,3 @@ type (
 		MatchKey     string    `json:",omitempty"`
 	}
 )
-
-func (i *JobInfo) WaitTimeInSec() int {
-	return i.WaitTimeInMs / 1000
-}
-
-func (i *JobInfo) RunTimeInSec() int {
-	return i.RunTimeInMs / 1000
-}
