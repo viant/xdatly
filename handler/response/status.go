@@ -16,14 +16,22 @@ type (
 	}
 
 	JobInfo struct {
-		RequestTime time.Time `json:",omitempty"`
-		JobStatus   string    `json:",omitempty"`
-		CreateTime  time.Time `json:",omitempty"`
-		WaitTimeMcs int       `json:",omitempty"`
-		RunTimeMcs  int       `json:",omitempty"`
-		ExpiryInSec int       `json:",omitempty"`
-		CacheKey    string    `json:",omitempty"`
-		CacheHit    bool      `json:",omitempty"`
-		MatchKey    string    `json:",omitempty"`
+		RequestTime  time.Time `json:",omitempty"`
+		JobStatus    string    `json:",omitempty"`
+		CreateTime   time.Time `json:",omitempty"`
+		WaitTimeInMs int       `json:",omitempty"`
+		RunTimeInMs  int       `json:",omitempty"`
+		ExpiryInSec  int       `json:",omitempty"`
+		CacheKey     string    `json:",omitempty"`
+		CacheHit     bool      `json:",omitempty"`
+		MatchKey     string    `json:",omitempty"`
 	}
 )
+
+func (i *JobInfo) WaitTimeInSec() int {
+	return i.WaitTimeInMs / 1000
+}
+
+func (i *JobInfo) RunTimeInSec() int {
+	return i.RunTimeInMs / 1000
+}
