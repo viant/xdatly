@@ -22,6 +22,7 @@ type (
 		Request
 		Principal
 		MainView      string     `json:",omitempty" sqlx:"MainView"`
+		Module        string     `json:",omitempty" sqlx:"Module"`
 		Labels        string     `json:",omitempty"`
 		JobType       string     `json:",omitempty"`
 		EventURL      string     `json:",omitempty"`
