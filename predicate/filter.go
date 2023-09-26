@@ -1,5 +1,13 @@
 package predicate
 
+type NamedFilters []*NamedFilter
+
+type NamedFilter struct {
+	Name    string
+	Include []string `json:",omitempty"`
+	Exclude []string `json:",omitempty"`
+}
+
 type StringsFilter struct {
 	Include []string `json:",omitempty"`
 	Exclude []string `json:",omitempty"`
