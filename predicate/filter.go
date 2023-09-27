@@ -3,7 +3,7 @@ package predicate
 type NamedFilters []*NamedFilter
 
 type NamedFilter struct {
-	Name    string
+	Name    string   `xls:"name=Filter"`
 	Include []string `json:",omitempty"`
 	Exclude []string `json:",omitempty"`
 }
