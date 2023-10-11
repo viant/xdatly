@@ -6,4 +6,5 @@ const (
 	StatusPending Status = "PENDING"
 	StatusRunning Status = "RUNNING"
 	StatusDone    Status = "DONE"
+	StatusError   Status = "ERROR"
 )
