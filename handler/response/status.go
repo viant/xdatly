@@ -12,7 +12,7 @@ type (
 		Message string                 `json:",omitempty"`
 		Errors  interface{}            `json:",omitempty"`
 		Warning []*Warning             `json:",omitempty"`
-		Extras  map[string]interface{} `json:",omitempty" default:"embedded=true"`
+		Extras  map[string]interface{} `json:",omitempty" format:"inline=true"`
 	}
 
 	JobInfo struct {
