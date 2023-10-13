@@ -1,4 +1,4 @@
-package documentation
+package docs
 
 type (
 	Options struct {
