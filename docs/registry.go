@@ -28,7 +28,11 @@ func (r *Registry) Lookup(name string) Provider {
 	return ret
 }
 
-var register = &Registry{byName: map[string]Provider{}}
+var register = New()
+
+func New() *Registry {
+	return &Registry{byName: map[string]Provider{}}
+}
 
 func Register(name string, provider Provider) {
 	register.Register(name, provider)
