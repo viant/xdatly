@@ -13,7 +13,7 @@ type (
 	Option func(o *Options)
 
 	Connector interface {
-		DB() *sql.DB
+		DB() (*sql.DB, error)
 	}
 )
 
