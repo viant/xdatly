@@ -4,7 +4,7 @@ import "context"
 
 type (
 	Provider interface {
-		Service(ctx context.Context, options ...Option) Service
+		Service(ctx context.Context, options ...Option) (Service, error)
 	}
 
 	Service interface {

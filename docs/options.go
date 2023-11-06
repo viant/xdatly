@@ -1,12 +1,20 @@
 package docs
 
+import (
+	"database/sql"
+)
+
 type (
 	Options struct {
 		URL       string
-		Connector string
+		Connector Connector
 	}
 
 	Option func(o *Options)
+
+	Connector interface {
+		DB() (*sql.DB, error)
+	}
 )
 
 func WithURL(URL string) Option {
@@ -15,7 +23,7 @@ func WithURL(URL string) Option {
 	}
 }
 
-func WithConnector(connector string) Option {
+func WithConnector(connector Connector) Option {
 	return func(o *Options) {
 		o.Connector = connector
 	}
