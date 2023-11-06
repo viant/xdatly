@@ -1,4 +1,4 @@
-package json
+package tjson
 
 type (
 	//Column represent column header
