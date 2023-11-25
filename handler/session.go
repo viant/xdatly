@@ -10,6 +10,16 @@ import (
 	"github.com/viant/xdatly/handler/validator"
 )
 
+type (
+	key      string
+	inputKey string
+)
+
+const (
+	Key      = key("session")
+	InputKey = inputKey("input")
+)
+
 type Session interface {
 	Validator() *validator.Service
 	Differ() *differ.Service
