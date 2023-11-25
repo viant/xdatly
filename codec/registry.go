@@ -36,7 +36,7 @@ func WithCodec(name string, codec Instance, at time.Time) RegistryOption {
 	}
 }
 
-var registryInstance = NewRegistry()
+var registryInstance = New()
 
 func Codecs(notifier func(codec *Codec)) (codecs map[string]*Codec, closer func()) {
 	return registryInstance.Codecs(notifier)
@@ -54,7 +54,7 @@ func Register(name string, codec *Codec) {
 	registryInstance.RegisterCodec(name, codec)
 }
 
-func NewRegistry(opts ...RegistryOption) *Registry {
+func New(opts ...RegistryOption) *Registry {
 	r := &Registry{
 		registry:  map[string]*Codec{},
 		notifiers: map[int64]func(codec *Codec){},

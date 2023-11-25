@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	registry struct {
+	Registry struct {
 		sync.Mutex
 		notifiers map[int64]NotifierFn
 		registry  map[string]*Template
@@ -15,7 +15,7 @@ type (
 	NotifierFn func(template *Template)
 )
 
-func (r *registry) Lookup(name string) (*Template, error) {
+func (r *Registry) Lookup(name string) (*Template, error) {
 	ret, ok := r.registry[name]
 	if !ok {
 		return nil, fmt.Errorf("failed to lookup predicate template: %v", name)
@@ -23,10 +23,15 @@ func (r *registry) Lookup(name string) (*Template, error) {
 	return ret, nil
 }
 
-var instance *registry
+// New creates a new registry
+func New() *Registry {
+	return &Registry{registry: map[string]*Template{}, notifiers: map[int64]NotifierFn{}}
+}
+
+var instance *Registry
 
 func init() {
-	instance = &registry{registry: map[string]*Template{}, notifiers: map[int64]NotifierFn{}}
+	instance = New()
 }
 
 func RegisterTemplate(template *Template) {
@@ -37,7 +42,7 @@ func Templates(callback NotifierFn) (types map[string]*Template, closer func()) 
 	return instance.templates(callback)
 }
 
-func (r *registry) register(template *Template) {
+func (r *Registry) register(template *Template) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -47,7 +52,7 @@ func (r *registry) register(template *Template) {
 	}
 }
 
-func (r *registry) templates(callback NotifierFn) (map[string]*Template, func()) {
+func (r *Registry) templates(callback NotifierFn) (map[string]*Template, func()) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -72,7 +77,7 @@ func (r *registry) templates(callback NotifierFn) (map[string]*Template, func())
 
 }
 
-func (r *registry) key() int64 {
+func (r *Registry) key() int64 {
 	now := time.Now().Unix()
 	for {
 		if _, ok := r.notifiers[now]; ok {
