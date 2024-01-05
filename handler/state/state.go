@@ -4,10 +4,16 @@ import "context"
 
 type Stater interface {
 	Into(ctx context.Context, state interface{}) error
+
+	Value(ctx context.Context, key string) (interface{}, bool, error)
 }
 
 type Service struct {
 	stater Stater
+}
+
+func (s Service) Value(ctx context.Context, key string) (interface{}, bool, error) {
+	return s.stater.Value(ctx, key)
 }
 
 func (s Service) Into(ctx context.Context, state interface{}) error {
