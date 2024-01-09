@@ -37,9 +37,29 @@ func getDependentTypes(rType reflect.Type) map[reflect.Type]bool {
 	if rType.Kind() == reflect.Struct {
 		structPtr := reflect.PtrTo(rType)
 		discoverDependentTypes(rType, rType, depTypes)
+		discoverFieldDependencies(rType, depTypes)
 		discoverDependentTypes(structPtr, rType, depTypes)
 	}
 	return depTypes
+}
+
+func discoverFieldDependencies(rType reflect.Type, types map[reflect.Type]bool) {
+	for i := 0; i < rType.NumField(); i++ {
+		candidate := rType.Field(i).Type
+		if candidate.Kind() == reflect.Slice {
+			candidate = candidate.Elem()
+		}
+		if candidate.Kind() == reflect.Ptr {
+			candidate = candidate.Elem()
+		}
+		if candidate.Kind() != reflect.Struct {
+			continue
+		}
+		if candidate.PkgPath() != rType.PkgPath() || candidate == rType {
+			continue
+		}
+		types[candidate] = true
+	}
 }
 
 func discoverDependentTypes(srcType reflect.Type, rType reflect.Type, dep map[reflect.Type]bool) {
