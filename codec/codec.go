@@ -12,7 +12,6 @@ type (
 		Args       []string
 		OutputType string
 		//Optional builder
-		CriteriaBuilder func(ctx context.Context, expr string, input interface{}) (*Criteria, error) `json:"-" yaml:"-"`
 	}
 
 	Factory interface {

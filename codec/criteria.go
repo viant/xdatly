@@ -6,6 +6,8 @@ import (
 )
 
 type (
+	criteriaBuilderKey string
+
 	CriteriaBuilder interface {
 		BuildCriteria(ctx context.Context, value interface{}, options *CriteriaBuilderOptions) (*Criteria, error)
 	}
@@ -16,6 +18,7 @@ type (
 	}
 
 	CriteriaBuilderOptions struct {
+		Expression string
 		Columns    ColumnsSource
 		Parameters ValueGetter
 		Selector   Selector
@@ -40,3 +43,23 @@ type (
 		IgnoreRead()
 	}
 )
+
+const (
+	_criteriaBuilderKey criteriaBuilderKey = "CriteriaBuilder"
+)
+
+// NewCriteriaBuilder creates a new criteria builder context
+func NewCriteriaBuilder(ctx context.Context, builder CriteriaBuilder) context.Context {
+	return context.WithValue(ctx, _criteriaBuilderKey, builder)
+}
+
+// CriteriaBuilderFromContext returns criteria builder from context
+func CriteriaBuilderFromContext(ctx context.Context) CriteriaBuilder {
+	if ctx == nil {
+		return nil
+	}
+	if builder, ok := ctx.Value(_criteriaBuilderKey).(CriteriaBuilder); ok {
+		return builder
+	}
+	return nil
+}
