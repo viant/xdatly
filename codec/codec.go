@@ -7,10 +7,11 @@ import (
 
 type (
 	Config struct {
-		Body       string
-		InputType  reflect.Type
-		Args       []string
-		OutputType string
+		Body            string
+		InputType       reflect.Type `json:"-" yaml:"-"`
+		Args            []string
+		OutputType      string
+		CriteriaBuilder func(ctx context.Context, expr string, input interface{}) (*Criteria, error) `json:"-" yaml:"-"`
 	}
 
 	Factory interface {
