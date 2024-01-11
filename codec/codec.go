@@ -11,7 +11,8 @@ type (
 		InputType  reflect.Type `json:"-" yaml:"-"`
 		Args       []string
 		OutputType string
-		Builder    func(ctx context.Context, expr string, input interface{}) (*Criteria, error) `json:"-" yaml:"-"`
+		//Optional builder
+		CriteriaBuilder func(ctx context.Context, expr string, input interface{}) (*Criteria, error) `json:"-" yaml:"-"`
 	}
 
 	Factory interface {
