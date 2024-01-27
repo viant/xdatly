@@ -30,20 +30,20 @@ func ExpandSQL(SQL string, args []interface{}) string {
 		case bool:
 			SQL = strings.Replace(SQL, "?", strconv.FormatBool(actual), 1)
 		case time.Time:
-			SQL = strings.Replace(SQL, "?", actual.Format(time.DateTime), 1)
+			SQL = strings.Replace(SQL, "?", "'"+actual.Format(time.DateTime), 1) + "'"
 		case *time.Time:
 			if actual == nil {
 				SQL = strings.Replace(SQL, "?", " NULL ", 1)
 			} else {
-				SQL = strings.Replace(SQL, "?", actual.Format(time.DateTime), 1)
+				SQL = strings.Replace(SQL, "?", "'"+actual.Format(time.DateTime)+"'", 1)
 			}
 		case string:
-			SQL = strings.Replace(SQL, "'?'", actual, 1)
+			SQL = strings.Replace(SQL, "?", "'"+actual+"'", 1)
 		case *string:
 			if actual == nil {
 				SQL = strings.Replace(SQL, "?", " NULL ", 1)
 			} else {
-				SQL = strings.Replace(SQL, "'?'", *actual, 1)
+				SQL = strings.Replace(SQL, "?", "'"+*actual+"'", 1)
 			}
 		default:
 			val, ok := arg.(string)
