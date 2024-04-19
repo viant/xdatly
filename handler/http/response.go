@@ -1,13 +1,9 @@
 package http
 
-type ErrorStatusCoder interface {
-	ErrorStatusCode() int
-}
+import "net/http"
 
-type ErrorMessager interface {
-	ErrorMessage() string
-}
-
-type ErrorObjecter interface {
-	ErrorObject() interface{}
+type Response interface {
+	StatusCode() int
+	Headers() http.Header
+	Value() interface{}
 }
