@@ -31,6 +31,7 @@ type Context struct {
 	values                     map[string]interface{}
 	StartTime                  time.Time
 	IgnoreEmptyQueryParameters bool
+	StatusCode                 int
 }
 
 func (c *Context) SetValue(key string, value interface{}) {
