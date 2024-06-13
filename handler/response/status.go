@@ -4,8 +4,8 @@ import "time"
 
 type (
 	Warning struct {
-		Message string `json:",omitempty"`
-		Reason  string `json:",omitempty"`
+		Message string `json:"message,omitempty"`
+		Reason  string `json:"reason,omitempty"`
 	}
 	Status struct {
 		Status  string                 `json:",omitempty"`

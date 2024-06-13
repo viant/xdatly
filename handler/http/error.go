@@ -13,12 +13,12 @@ type ErrorObjecter interface {
 }
 
 type Error struct {
-	View       string      `json:"view,omitempty" default:"nullable=true,required=false,allowEmpty=true"`
-	Parameter  string      `json:"parameter,omitempty" default:"nullable=true,required=false,allowEmpty=true"`
-	StatusCode int         `json:"statusCode,omitempty" default:"nullable=true,required=false,allowEmpty=true"`
+	View       string      `json:",omitempty" default:"nullable=true,required=false,allowEmpty=true"`
+	Parameter  string      `json:",omitempty" default:"nullable=true,required=false,allowEmpty=true"`
+	StatusCode int         `json:",omitempty" default:"nullable=true,required=false,allowEmpty=true"`
 	Err        error       `json:"-"`
-	Message    string      `json:"message,omitempty" default:"nullable=true,required=false,allowEmpty=true"`
-	Object     interface{} `json:"object,omitempty" default:"nullable=true,required=false,allowEmpty=true"`
+	Message    string      `json:",omitempty" default:"nullable=true,required=false,allowEmpty=true"`
+	Object     interface{} `json:",omitempty" default:"nullable=true,required=false,allowEmpty=true"`
 }
 
 func (e *Error) ErrorStatusCode() int {
