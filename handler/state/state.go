@@ -16,8 +16,8 @@ func (s Service) Value(ctx context.Context, key string) (interface{}, bool, erro
 	return s.stater.Value(ctx, key)
 }
 
-func (s Service) Into(ctx context.Context, state interface{}) error {
-	return s.stater.Into(ctx, state)
+func (s Service) Into(ctx context.Context, state interface{}, opt ...Option) error {
+	return s.stater.Into(ctx, state, opt...)
 }
 
 func New(stater Stater) *Service {
