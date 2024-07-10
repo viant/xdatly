@@ -9,6 +9,13 @@ type (
 	}
 )
 
+// WithScope returns option with scope
+func WithScope(scope string) Option {
+	return func(o *Options) {
+		o.scope = scope
+	}
+}
+
 // Scope returns scope
 func (s *Options) Scope() string {
 	return s.scope
