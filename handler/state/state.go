@@ -3,7 +3,7 @@ package state
 import "context"
 
 type Stater interface {
-	Into(ctx context.Context, state interface{}) error
+	Into(ctx context.Context, state interface{}, opt ...Option) error
 
 	Value(ctx context.Context, key string) (interface{}, bool, error)
 }
