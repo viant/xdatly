@@ -10,6 +10,7 @@ type (
 		WithDB         *sql.DB
 		WithUnique     bool
 		WithRef        bool
+		Location       string
 		WithValidation *Validation
 	}
 
@@ -26,44 +27,51 @@ func (o *Options) Apply(opts []Option) {
 	}
 }
 
-//WithShallow creates with shallow option
+// WithShallow creates with shallow option
 func WithShallow(f bool) Option {
 	return func(o *Options) {
 		o.WithShallow = f
 	}
 }
 
-//WithShallow creates with shallow option
+// WithShallow creates with shallow option
 func WithSetMarker(f bool) Option {
 	return func(o *Options) {
 		o.WithSetMarker = f
 	}
 }
 
-//WithDB create with db validation option
+// WithDB create with db validation option
 func WithDB(db *sql.DB) Option {
 	return func(o *Options) {
 		o.WithDB = db
 	}
 }
 
-//WithRefCheck return with ref check option
+// WithRefCheck return with ref check option
 func WithRefCheck(flag bool) Option {
 	return func(o *Options) {
 		o.WithRef = flag
 	}
 }
 
-//WithUnique returns with unique check
+// WithUnique returns with unique check
 func WithUnique(flag bool) Option {
 	return func(o *Options) {
 		o.WithUnique = flag
 	}
 }
 
-//WithValidation creates with Validation option
+// WithValidation creates with Validation option
 func WithValidation(v *Validation) Option {
 	return func(o *Options) {
 		o.WithValidation = v
+	}
+}
+
+// WithLocation creates with location option
+func WithLocation(location string) Option {
+	return func(o *Options) {
+		o.Location = location
 	}
 }

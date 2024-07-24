@@ -13,6 +13,7 @@ type (
 func WithScope(scope string) Option {
 	return func(o *Options) {
 		o.scope = scope
+
 	}
 }
 
