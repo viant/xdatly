@@ -2,6 +2,7 @@ package validator
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -20,7 +21,16 @@ type (
 		Violations []*Violation `json:",omitempty"`
 		Failed     bool         `json:",omitempty"`
 	}
+
+	Violations []*Violation
 )
+
+// Sort sorts violations
+func (v Violations) Sort() {
+	sort.Slice(v, func(i, j int) bool {
+		return v[i].Location < v[j].Location
+	})
+}
 
 // Append appends violation
 func (v *Validation) Append(location, field string, value interface{}, check string, msg string) {
