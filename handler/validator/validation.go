@@ -18,8 +18,8 @@ type (
 
 	//Validation represents validation
 	Validation struct {
-		Violations []*Violation `json:",omitempty"`
-		Failed     bool         `json:",omitempty"`
+		Violations Violations `json:",omitempty"`
+		Failed     bool       `json:",omitempty"`
 	}
 
 	Violations []*Violation
