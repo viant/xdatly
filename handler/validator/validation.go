@@ -43,3 +43,8 @@ func (v *Validation) Append(location, field string, value interface{}, check str
 func (v *Validation) AddViolation(location, field string, value interface{}, check string, msg string) {
 	v.Append(location, field, value, check, msg)
 }
+
+// NewValidation returns a validation
+func NewValidation() *Validation {
+	return &Validation{Violations: make([]*Violation, 0)}
+}

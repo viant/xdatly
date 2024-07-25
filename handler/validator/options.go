@@ -2,16 +2,19 @@ package validator
 
 import "database/sql"
 
+type CanUseMarkerProvider func(v interface{}) bool
+
 type (
 	//Options defins validator options
 	Options struct {
-		WithShallow    bool
-		WithSetMarker  bool
-		WithDB         *sql.DB
-		WithUnique     bool
-		WithRef        bool
-		Location       string
-		WithValidation *Validation
+		WithShallow          bool
+		WithSetMarker        bool
+		WithDB               *sql.DB
+		WithUnique           bool
+		WithRef              bool
+		Location             string
+		CanUseMarkerProvider CanUseMarkerProvider
+		WithValidation       *Validation
 	}
 
 	//Option defines validator option
@@ -73,5 +76,13 @@ func WithValidation(v *Validation) Option {
 func WithLocation(location string) Option {
 	return func(o *Options) {
 		o.Location = location
+	}
+}
+
+// WithCanUseMarkerProvider creates with marker provider option
+func WithCanUseMarkerProvider(provider CanUseMarkerProvider) Option {
+	return func(o *Options) {
+		o.WithSetMarker = true
+		o.CanUseMarkerProvider = provider
 	}
 }
