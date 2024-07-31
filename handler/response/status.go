@@ -7,12 +7,13 @@ type (
 		Message string `json:"message,omitempty"`
 		Reason  string `json:"reason,omitempty"`
 	}
+
 	Status struct {
-		Status  string                 `json:",omitempty"`
-		Message string                 `json:",omitempty"`
-		Errors  interface{}            `json:",omitempty"`
-		Warning []*Warning             `json:",omitempty"`
-		Extras  map[string]interface{} `json:",omitempty" format:"inline=true"`
+		Status  string                 `json:"status,omitempty"`
+		Message string                 `json:"message,omitempty"`
+		Errors  interface{}            `json:"errors,omitempty"`
+		Warning []*Warning             `json:"warning,omitempty"`
+		Extras  map[string]interface{} `json:"extras,omitempty" format:"inline=true"`
 	}
 
 	JobInfo struct {
