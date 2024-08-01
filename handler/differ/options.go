@@ -20,16 +20,44 @@ func (o *Options) Apply(opts ...Option) {
 	}
 }
 
-//WithShallow creates with shallow option
+// WithShallow creates with shallow option
 func WithShallow(f bool) Option {
 	return func(o *Options) {
 		o.WithShallow = f
 	}
 }
 
-//WithShallow creates with shallow option
+// WithSetMarker creates with shallow option
 func WithSetMarker(f bool) Option {
 	return func(o *Options) {
 		o.WithSetMarker = f
+	}
+}
+
+type (
+	logOptions struct {
+		source string
+		id     interface{}
+		userID interface{}
+	}
+
+	LogOption func(l *logOptions)
+)
+
+func WithSource(source string) LogOption {
+	return func(l *logOptions) {
+		l.source = source
+	}
+}
+
+func WithSourceID(id interface{}) LogOption {
+	return func(l *logOptions) {
+		l.id = id
+	}
+}
+
+func WithUserID(userID interface{}) LogOption {
+	return func(l *logOptions) {
+		l.userID = userID
 	}
 }

@@ -8,13 +8,19 @@ type (
 )
 
 // ToChangeRecords converts changeLog to change records
-func (l *ChangeLog) ToChangeRecords(source, id, userID string) []*ChangeRecord {
+func (l *ChangeLog) ToChangeRecords(options ...LogOption) []*ChangeRecord {
 	var result []*ChangeRecord
+
+	opts := &logOptions{}
+	for _, opt := range options {
+		opt(opts)
+	}
+
 	for _, change := range l.Changes {
 		result = append(result, &ChangeRecord{
-			Source:   source,
-			SourceID: id,
-			UserID:   userID,
+			Source:   opts.source,
+			SourceID: opts.id,
+			UserID:   opts.userID,
 			Path:     change.Path.String(),
 			Change:   string(change.Type),
 			From:     change.From,
