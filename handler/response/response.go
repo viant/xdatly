@@ -8,7 +8,6 @@ import (
 // StatusCoder represents a status code
 type StatusCoder interface {
 	StatusCode() int
-	SetStatusCode(int)
 }
 
 // Response represents a response
@@ -17,6 +16,7 @@ type Response interface {
 	Body() io.Reader
 	Headers() http.Header
 	Size() int
+	SetStatusCode(int)
 }
 
 // Compressed represents a compressed response

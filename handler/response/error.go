@@ -1,6 +1,7 @@
 package response
 
 import (
+	"fmt"
 	"io"
 	"reflect"
 	"strings"
@@ -18,6 +19,10 @@ type Error struct {
 
 func (e *Error) StatusCode() int {
 	return e.Code
+}
+
+func (e *Error) SetStatusCode(code int) {
+	e.Code = code
 }
 
 func (e *Error) Reader() io.Reader {
@@ -57,6 +62,9 @@ func NewError(code int, message string, opts ...ErrorOption) *Error {
 			}
 			opt(ret)
 		}
+	}
+	if ret.Err == nil {
+		ret.Err = fmt.Errorf(ret.Message)
 	}
 	return ret
 }
