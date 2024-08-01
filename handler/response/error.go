@@ -50,8 +50,13 @@ func NewError(code int, message string, opts ...ErrorOption) *Error {
 		Code:    code,
 		Message: message,
 	}
-	for _, opt := range opts {
-		opt(ret)
+	if len(opts) > 0 {
+		for _, opt := range opts {
+			if opt == nil {
+				continue
+			}
+			opt(ret)
+		}
 	}
 	return ret
 }
