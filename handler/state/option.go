@@ -1,14 +1,12 @@
 package state
 
-import "github.com/viant/xdatly/handler/http"
-
 type (
 	//Option represents state option
 	Option func(o *Options)
 	//Options represents state options
 	Options struct {
 		scope     string
-		form      *http.Form
+		form      *Form
 		constants map[string]string
 	}
 )
@@ -27,7 +25,7 @@ func (s *Options) Scope() string {
 }
 
 // Form returns form
-func (s *Options) Form() *http.Form {
+func (s *Options) Form() *Form {
 	return s.form
 }
 
@@ -47,7 +45,7 @@ func WithConstants(key string, value string) Option {
 }
 
 // WithForm returns option with form
-func WithForm(form *http.Form) Option {
+func WithForm(form *Form) Option {
 	return func(o *Options) {
 		o.form = form
 	}
