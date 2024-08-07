@@ -14,22 +14,6 @@ type (
 	}
 )
 
-// WithScope returns option with scope
-func WithScope(scope string) Option {
-	return func(o *Options) {
-		o.scope = scope
-
-	}
-}
-
-// WithHttpRequest returns option with scope
-func WithHttpRequest(httpRequest *http.Request) Option {
-	return func(o *Options) {
-		o.httpRequest = httpRequest
-
-	}
-}
-
 // Scope returns scope
 func (s *Options) Scope() string {
 	return s.scope
@@ -64,6 +48,22 @@ func WithConstants(key string, value string) Option {
 func WithForm(form *Form) Option {
 	return func(o *Options) {
 		o.form = form
+	}
+}
+
+// WithScope returns option with scope
+func WithScope(scope string) Option {
+	return func(o *Options) {
+		o.scope = scope
+
+	}
+}
+
+// WithHttpRequest returns option with scope
+func WithHttpRequest(httpRequest *http.Request) Option {
+	return func(o *Options) {
+		o.httpRequest = httpRequest
+
 	}
 }
 
