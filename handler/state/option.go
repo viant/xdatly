@@ -10,7 +10,7 @@ type (
 		scope       string
 		form        *Form
 		httpRequest *http.Request
-		constants   map[string]string
+		constants   map[string]interface{}
 	}
 )
 
@@ -41,7 +41,7 @@ func (s *Options) Form() *Form {
 }
 
 // Constants returns constants
-func (s *Options) Constants() map[string]string {
+func (s *Options) Constants() map[string]interface{} {
 	return s.constants
 }
 
@@ -54,7 +54,7 @@ func (s *Options) HttpRequest() *http.Request {
 func WithConstants(key string, value string) Option {
 	return func(o *Options) {
 		if o.constants == nil {
-			o.constants = make(map[string]string)
+			o.constants = make(map[string]interface{})
 		}
 		o.constants[key] = value
 	}
