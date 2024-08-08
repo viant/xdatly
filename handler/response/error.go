@@ -39,6 +39,7 @@ func NewParameterError(view, parameter string, err error, opts ...ErrorOption) *
 		View:      view,
 		Parameter: parameter,
 		Err:       err,
+		Message:   err.Error(),
 	}
 	for _, opt := range opts {
 		opt(ret)
