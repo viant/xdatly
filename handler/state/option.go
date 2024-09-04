@@ -11,6 +11,7 @@ type (
 		form        *Form
 		httpRequest *http.Request
 		constants   map[string]interface{}
+		pathParams  map[string]string
 	}
 )
 
@@ -32,6 +33,11 @@ func (s *Options) Constants() map[string]interface{} {
 // HttpRequest returns http request
 func (s *Options) HttpRequest() *http.Request {
 	return s.httpRequest
+}
+
+// PathParameters returns path parameters
+func (s *Options) PathParameters() map[string]string {
+	return s.pathParams
 }
 
 // WithConstants returns option with constants
@@ -56,6 +62,16 @@ func WithScope(scope string) Option {
 	return func(o *Options) {
 		o.scope = scope
 
+	}
+}
+
+// WithPathParameter returns option with path parameters
+func WithPathParameter(name, value string) Option {
+	return func(o *Options) {
+		if len(o.pathParams) == 0 {
+			o.pathParams = make(map[string]string)
+		}
+		o.pathParams[name] = value
 	}
 }
 
