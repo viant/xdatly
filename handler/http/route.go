@@ -1,7 +1,7 @@
 package http
 
+// Route represents http route
 type Route struct {
-	Name   string
 	URL    string
 	Method string
 }

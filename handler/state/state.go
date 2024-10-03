@@ -1,11 +1,15 @@
 package state
 
-import "context"
+import (
+	"context"
+)
 
 type Stater interface {
-	Into(ctx context.Context, state interface{}, opt ...Option) error
+	Into(ctx context.Context, any interface{}, opt ...Option) error
 
 	Value(ctx context.Context, key string) (interface{}, bool, error)
+
+	ValuesOf(ctx context.Context, any interface{}) (map[string]interface{}, error)
 }
 
 type Service struct {

@@ -1,17 +1,24 @@
 package state
 
-import "net/http"
+import (
+	"net/http"
+	"net/url"
+)
 
 type (
 	//Option represents state option
 	Option func(o *Options)
 	//Options represents state options
 	Options struct {
+		query      url.Values
+		headers    http.Header
+		body       []byte
+		pathParams map[string]string
+
 		scope       string
 		form        *Form
 		httpRequest *http.Request
 		constants   map[string]interface{}
-		pathParams  map[string]string
 	}
 )
 
@@ -38,6 +45,21 @@ func (s *Options) HttpRequest() *http.Request {
 // PathParameters returns path parameters
 func (s *Options) PathParameters() map[string]string {
 	return s.pathParams
+}
+
+// Query returns query
+func (s *Options) Query() url.Values {
+	return s.query
+}
+
+// Headers returns headers
+func (s *Options) Headers() http.Header {
+	return s.headers
+}
+
+// Body returns body
+func (s *Options) Body() []byte {
+	return s.body
 }
 
 // WithConstants returns option with constants
@@ -90,4 +112,55 @@ func NewOptions(options ...Option) *Options {
 		option(result)
 	}
 	return result
+}
+
+// WithQuery returns option with query
+func WithQuery(query url.Values) Option {
+	return func(o *Options) {
+		o.query = query
+	}
+}
+
+// WithQueryParameter returns option with query parameters
+func WithQueryParameters(name string, values []string) Option {
+	return func(o *Options) {
+		if len(o.query) == 0 {
+			o.query = make(url.Values)
+		}
+		o.query[name] = append(o.query[name], values...)
+	}
+}
+
+// WithQueryParameter returns option with query parameters
+func WithQueryParameter(name, value string) Option {
+	return func(o *Options) {
+		if len(o.query) == 0 {
+			o.query = make(url.Values)
+		}
+		o.query.Add(name, value)
+	}
+}
+
+// WithHeader returns option with header
+func WithHeader(name, value string) Option {
+	return func(o *Options) {
+		if len(o.headers) == 0 {
+			o.headers = make(http.Header)
+		}
+		o.headers.Add(name, value)
+	}
+}
+
+// WithHeaders returns option with headers
+func WithHeaders(headers http.Header) Option {
+	return func(o *Options) {
+		o.headers = headers
+	}
+}
+
+// WithBody returns option with body
+func WithBody(body []byte) Option {
+	return func(o *Options) {
+		o.body = body
+	}
 }
