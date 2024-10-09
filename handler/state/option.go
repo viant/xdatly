@@ -121,13 +121,13 @@ func WithQuery(query url.Values) Option {
 	}
 }
 
-// WithQueryParameter returns option with query parameters
+// WithQueryParameters returns option with query parameters
 func WithQueryParameters(name string, values []string) Option {
 	return func(o *Options) {
 		if len(o.query) == 0 {
 			o.query = make(url.Values)
 		}
-		o.query[name] = append(o.query[name], values...)
+		o.query[name] = values
 	}
 }
 
@@ -137,7 +137,7 @@ func WithQueryParameter(name, value string) Option {
 		if len(o.query) == 0 {
 			o.query = make(url.Values)
 		}
-		o.query.Add(name, value)
+		o.query[name] = []string{value}
 	}
 }
 
@@ -147,7 +147,7 @@ func WithHeader(name, value string) Option {
 		if len(o.headers) == 0 {
 			o.headers = make(http.Header)
 		}
-		o.headers.Add(name, value)
+		o.headers[name] = []string{value}
 	}
 }
 
