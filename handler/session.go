@@ -27,6 +27,6 @@ type Session interface {
 	Db(opts ...sqlx.Option) (*sqlx.Service, error)
 	Stater() *state.Service
 	FlushTemplate(ctx context.Context) error
-	Route(ctx context.Context, route *http.Route, opts ...state.Option) (Session, error)
+	Session(ctx context.Context, route *http.Route, opts ...state.Option) (Session, error)
 	Http() http.Http
 }
