@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"github.com/viant/xdatly/handler/auth"
 	"github.com/viant/xdatly/handler/differ"
 	"github.com/viant/xdatly/handler/http"
 	"github.com/viant/xdatly/handler/mbus"
@@ -29,4 +30,5 @@ type Session interface {
 	FlushTemplate(ctx context.Context) error
 	Session(ctx context.Context, route *http.Route, opts ...state.Option) (Session, error)
 	Http() http.Http
+	Auth() auth.Auth
 }
