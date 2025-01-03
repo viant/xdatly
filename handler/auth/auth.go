@@ -27,4 +27,5 @@ type Authenticator interface {
 	BasicAuth(ctx context.Context, user string, password string) (*auth.Token, error)
 	VerifyIdentity(ctx context.Context, idToken string) (*jwt.Claims, error)
 	ReissueIdentityToken(ctx context.Context, refreshToken string, subject string) (*auth.Token, error)
+	ResetCredentials(ctx context.Context, email, newPassword string) error
 }
