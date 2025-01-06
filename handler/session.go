@@ -14,11 +14,14 @@ import (
 type (
 	key      string
 	inputKey string
+
+	syncKey string
 )
 
 const (
-	Key      = key("session")
-	InputKey = inputKey("input")
+	Key         = key("session")
+	InputKey    = inputKey("input")
+	DataSyncKey = syncKey("dataSync")
 )
 
 type Session interface {
