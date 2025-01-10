@@ -44,3 +44,9 @@ func (d *DataSync) Wait(key string) {
 	lock.RLock()
 	lock.RUnlock()
 }
+
+func NewDataSync() *DataSync {
+	return &DataSync{
+		aMap: make(map[string]*sync.RWMutex),
+	}
+}
