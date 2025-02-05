@@ -12,7 +12,9 @@ func (d *DataSync) Put(key string) {
 	d.rw.Lock()
 	defer d.rw.Unlock()
 	if _, ok := d.aMap[key]; !ok {
-		d.aMap[key] = &sync.RWMutex{}
+		lock := &sync.RWMutex{}
+		lock.Lock()
+		d.aMap[key] = lock
 	}
 }
 
@@ -28,21 +30,22 @@ func (d *DataSync) Get(key string) *sync.RWMutex {
 func (d *DataSync) Delete(key string) {
 	d.rw.Lock()
 	defer d.rw.Unlock()
-	if _, ok := d.aMap[key]; ok {
+	if lock, ok := d.aMap[key]; ok {
+		lock.Unlock()
 		delete(d.aMap, key)
-
 	}
 }
 
-func (d *DataSync) Wait(key string) {
+func (d *DataSync) Wait(key string) bool {
 	d.rw.RLock()
 	lock, ok := d.aMap[key]
 	d.rw.RUnlock()
 	if !ok {
-		return
+		return false
 	}
 	lock.RLock()
 	lock.RUnlock()
+	return true
 }
 
 func NewDataSync() *DataSync {
