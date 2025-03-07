@@ -16,56 +16,6 @@ func RegisterType(packageName, typeName string, rType reflect.Type, insertedAt t
 		rType = rType.Elem()
 	}
 	instance.register(packageName, typeName, rType, insertedAt)
-	registerDependencies(packageName, rType, insertedAt)
-
-}
-
-func registerDependencies(packageName string, rType reflect.Type, insertedAt time.Time) {
-	if depTypes := getDependentTypes(rType); len(depTypes) > 0 { //dependent type are method call types that share the same package
-		for depType := range depTypes {
-			name := depType.Name()
-			if dotPos := strings.LastIndex(name, "."); dotPos != -1 {
-				name = name[dotPos:]
-			}
-			instance.register(packageName, name, depType, insertedAt)
-		}
-	}
-}
-
-func getDependentTypes(rType reflect.Type) map[reflect.Type]bool {
-	var depTypes = map[reflect.Type]bool{}
-	if rType.Kind() == reflect.Struct {
-		structPtr := reflect.PtrTo(rType)
-		discoverDependentTypes(rType, rType, depTypes)
-		discoverDependentTypes(structPtr, rType, depTypes)
-	}
-	return depTypes
-}
-
-func discoverDependentTypes(srcType reflect.Type, rType reflect.Type, dep map[reflect.Type]bool) {
-	for i := 0; i < srcType.NumMethod(); i++ {
-		method := srcType.Method(i)
-		fType := method.Func.Type()
-		for j := 0; j < fType.NumIn(); j++ {
-			argType := fType.In(j)
-			switch argType.Kind() {
-			case reflect.Ptr:
-				argType = argType.Elem()
-			case reflect.Slice:
-				argType = argType.Elem()
-				if argType.Kind() == reflect.Ptr {
-					argType = argType.Elem()
-				}
-			}
-			if argType.Kind() != reflect.Struct {
-				continue
-			}
-			if argType.PkgPath() != rType.PkgPath() || argType == rType {
-				continue
-			}
-			dep[argType] = true
-		}
-	}
 }
 
 func Types(callback NotifierFn) (types map[string]map[string]reflect.Type, closeFn func()) {
