@@ -44,6 +44,7 @@ type Context struct {
 	Header                     map[string]string `json:"header,omitempty"`
 	Metrics                    response.Metrics  `json:"metrics,omitempty"`
 	TraceID                    string            `json:"traceId,omitempty"`
+	Trace                      *tracing.Trace    `json:"-"`
 	mux                        sync.RWMutex
 	jobs                       []*async.Job
 	values                     map[string]interface{}
@@ -221,19 +222,20 @@ func CreateInitialSpan(method, uri string) *tracing.Span {
 }
 
 // NewContext creates a new context
-func NewContext(method string, URI string, header http.Header, version string) (*Context, *tracing.Trace) {
+func NewContext(method string, URI string, header http.Header, version string) *Context {
+	trace := tracing.NewTrace("datly", version)
 	ret := &Context{Method: method,
 		URI:       URI,
+		Trace:     trace,
 		StartTime: time.Now(),
 		values:    map[string]interface{}{}}
-	ret.setHeader(header)
 
-	trace := tracing.NewTrace("datly", version)
+	ret.setHeader(header)
 	trace.Append(CreateInitialSpan(method, URI))
 	if ret.TraceID != "" {
 		trace.TraceID = ret.TraceID
 	} else {
 		ret.TraceID = trace.TraceID
 	}
-	return ret, trace
+	return ret
 }
