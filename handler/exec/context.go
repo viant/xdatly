@@ -2,7 +2,14 @@ package exec
 
 import (
 	"context"
+	"github.com/google/uuid"
+	"github.com/viant/scy/auth/jwt"
 	"github.com/viant/xdatly/handler/async"
+	"github.com/viant/xdatly/handler/response"
+	"github.com/viant/xdatly/handler/tracing"
+	"net/http"
+	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -26,12 +33,47 @@ func GetContext(ctx context.Context) *Context {
 
 // Context represents an execution context
 type Context struct {
+	Method                     string            `json:"method,omitempty"`
+	URI                        string            `json:"uri,omitempty"`
+	StatusCode                 int               `json:"statusCode,omitempty"`
+	Status                     string            `json:"status,omitempty"`
+	Error                      string            `json:"error,omitempty"`
+	ElapsedMs                  int               `json:"elapsedMs,omitempty"`
+	StartTime                  time.Time         `json:"startTime,omitempty"`
+	Auth                       *jwt.Claims       `json:"auth,omitempty"`
+	Header                     map[string]string `json:"header,omitempty"`
+	Metrics                    response.Metrics  `json:"metrics,omitempty"`
+	TraceID                    string            `json:"traceId,omitempty"`
 	mux                        sync.RWMutex
 	jobs                       []*async.Job
 	values                     map[string]interface{}
-	StartTime                  time.Time
-	IgnoreEmptyQueryParameters bool
-	StatusCode                 int
+	IgnoreEmptyQueryParameters bool `json:"-"`
+}
+
+func (c *Context) SetError(err error) {
+	c.Error = err.Error()
+	c.Status = "error"
+}
+
+const trackingHeaderEnvKey = "XDATLY_TRACKING_HEADER"
+
+func (c *Context) setHeader(header http.Header) {
+	c.Header = make(map[string]string)
+	trackingHeaderKey := strings.ToUpper(os.Getenv(trackingHeaderEnvKey))
+	if trackingHeaderKey == "" {
+		trackingHeaderKey = "X-Trace-Id"
+	}
+	for k := range header {
+		lowerKey := strings.ToLower(k)
+		if strings.Contains(lowerKey, "auth") {
+			continue
+		}
+		if trackingHeaderKey == lowerKey {
+			c.TraceID = header.Get(k)
+			continue
+		}
+		c.Header[k] = header.Get(k)
+	}
 }
 
 func (c *Context) SetValue(key string, value interface{}) {
@@ -157,6 +199,41 @@ func (c *Context) AsyncStatus() string {
 	return string(async.StatusRunning)
 }
 
-func NewContext() *Context {
-	return &Context{StartTime: time.Now(), values: map[string]interface{}{}}
+// CreateInitialSpan constructs the first span for the trace.
+func CreateInitialSpan(method, uri string) *tracing.Span {
+	startTime := time.Now()
+	return &tracing.Span{
+		SpanID:    uuid.New().String(),
+		Name:      "HTTP " + method + " " + uri,
+		Kind:      "SERVER",
+		StartTime: startTime,
+		EndTime:   startTime, // Update this when the operation completes
+		Attributes: map[string]string{
+			"http.method": method,
+			"http.url":    uri,
+			// Add other relevant attributes as needed
+		},
+		Status: tracing.SpanStatus{
+			Code:    tracing.StatusOK,
+			Message: "",
+		},
+	}
+}
+
+// NewContext creates a new context
+func NewContext(method string, URI string, header http.Header, version string) (*Context, *tracing.Trace) {
+	ret := &Context{Method: method,
+		URI:       URI,
+		StartTime: time.Now(),
+		values:    map[string]interface{}{}}
+	ret.setHeader(header)
+
+	trace := tracing.NewTrace("datly", version)
+	trace.Append(CreateInitialSpan(method, URI))
+	if ret.TraceID != "" {
+		trace.TraceID = ret.TraceID
+	} else {
+		ret.TraceID = trace.TraceID
+	}
+	return ret, trace
 }
