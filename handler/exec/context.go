@@ -60,16 +60,17 @@ const trackingHeaderEnvKey = "XDATLY_TRACKING_HEADER"
 
 func (c *Context) setHeader(header http.Header) {
 	c.Header = make(map[string]string)
-	trackingHeaderKey := strings.ToUpper(os.Getenv(trackingHeaderEnvKey))
+	trackingHeaderKey := os.Getenv(trackingHeaderEnvKey)
 	if trackingHeaderKey == "" {
-		trackingHeaderKey = "X-Trace-Id"
+		trackingHeaderKey = "xtraceid"
 	}
+	trackingHeaderKey = strings.ReplaceAll(strings.ToLower(trackingHeaderKey), "-", "")
 	for k := range header {
 		lowerKey := strings.ToLower(k)
 		if strings.Contains(lowerKey, "auth") {
 			continue
 		}
-		if trackingHeaderKey == lowerKey {
+		if trackingHeaderKey == strings.ReplaceAll(lowerKey, "-", "") {
 			c.TraceID = header.Get(k)
 			continue
 		}
