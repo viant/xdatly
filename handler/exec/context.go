@@ -56,7 +56,7 @@ func (c *Context) SetError(err error) {
 	c.Status = "error"
 }
 
-const trackingHeaderEnvKey = "XDATLY_TRACKING_HEADER"
+const trackingHeaderEnvKey = "XDATLY_TRACING_HEADER"
 
 func (c *Context) setHeader(header http.Header) {
 	c.Header = make(map[string]string)
