@@ -45,12 +45,12 @@ type (
 )
 
 const (
-	_criteriaBuilderKey criteriaBuilderKey = "CriteriaBuilder"
+	CriteriaBuilderKey criteriaBuilderKey = "CriteriaBuilder"
 )
 
 // NewCriteriaBuilder creates a new criteria builder context
 func NewCriteriaBuilder(ctx context.Context, builder CriteriaBuilder) context.Context {
-	return context.WithValue(ctx, _criteriaBuilderKey, builder)
+	return context.WithValue(ctx, CriteriaBuilderKey, builder)
 }
 
 // CriteriaBuilderFromContext returns criteria builder from context
@@ -58,7 +58,7 @@ func CriteriaBuilderFromContext(ctx context.Context) CriteriaBuilder {
 	if ctx == nil {
 		return nil
 	}
-	if builder, ok := ctx.Value(_criteriaBuilderKey).(CriteriaBuilder); ok {
+	if builder, ok := ctx.Value(CriteriaBuilderKey).(CriteriaBuilder); ok {
 		return builder
 	}
 	return nil
