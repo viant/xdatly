@@ -28,3 +28,8 @@ type (
 		MatchKey     string    `json:",omitempty"`
 	}
 )
+
+// StatusSetter is an interface for types that can set status information
+type StatusSetter interface {
+	SetError(err error)
+}
