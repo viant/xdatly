@@ -5,6 +5,7 @@ import (
 	"github.com/viant/xdatly/handler/auth"
 	"github.com/viant/xdatly/handler/differ"
 	"github.com/viant/xdatly/handler/http"
+	"github.com/viant/xdatly/handler/logger"
 	"github.com/viant/xdatly/handler/mbus"
 	"github.com/viant/xdatly/handler/sqlx"
 	"github.com/viant/xdatly/handler/state"
@@ -34,4 +35,5 @@ type Session interface {
 	Session(ctx context.Context, route *http.Route, opts ...state.Option) (Session, error)
 	Http() http.Http
 	Auth() auth.Auth
+	Logger() logger.Logger
 }
