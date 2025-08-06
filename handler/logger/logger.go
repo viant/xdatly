@@ -5,6 +5,10 @@ import (
 	"log/slog"
 )
 
+type contextKey string
+
+const ContextKey = contextKey("logger")
+
 type Logger interface {
 	IsDebugEnabled() bool
 	IsInfoEnabled() bool
