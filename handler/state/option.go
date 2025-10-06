@@ -10,15 +10,16 @@ type (
 	Option func(o *Options)
 	//Options represents state options
 	Options struct {
-		query      url.Values
-		headers    http.Header
-		body       []byte
-		pathParams map[string]string
-
-		scope       string
-		form        *Form
-		httpRequest *http.Request
-		constants   map[string]interface{}
+		query         url.Values
+		headers       http.Header
+		body          []byte
+		pathParams    map[string]string
+		querySelector *QuerySelector
+		scope         string
+		form          *Form
+		httpRequest   *http.Request
+		constants     map[string]interface{}
+		input         interface{}
 	}
 )
 
@@ -47,6 +48,10 @@ func (s *Options) PathParameters() map[string]string {
 	return s.pathParams
 }
 
+func (s *Options) QuerySelector() *QuerySelector {
+	return s.querySelector
+}
+
 // Query returns query
 func (s *Options) Query() url.Values {
 	return s.query
@@ -60,6 +65,10 @@ func (s *Options) Headers() http.Header {
 // Body returns body
 func (s *Options) Body() []byte {
 	return s.body
+}
+
+func (s *Options) Input() interface{} {
+	return s.input
 }
 
 // WithConstants returns option with constants
@@ -151,6 +160,13 @@ func WithHeader(name, value string) Option {
 	}
 }
 
+// WithInput with input
+func WithInput(input interface{}) Option {
+	return func(o *Options) {
+		o.input = input
+	}
+}
+
 // WithHeaders returns option with headers
 func WithHeaders(headers http.Header) Option {
 	return func(o *Options) {
@@ -162,5 +178,11 @@ func WithHeaders(headers http.Header) Option {
 func WithBody(body []byte) Option {
 	return func(o *Options) {
 		o.body = body
+	}
+}
+
+func WithQuerySelector(selector *QuerySelector) Option {
+	return func(o *Options) {
+		o.querySelector = selector
 	}
 }
