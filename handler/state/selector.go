@@ -27,3 +27,19 @@ func (s *QuerySelector) SetCriteria(expanded string, placeholders []interface{})
 	s.Criteria = expanded
 	s.Placeholders = placeholders
 }
+
+type NamedQuerySelector struct {
+	Name string `json:",omitempty"`
+	QuerySelector
+}
+
+type QuerySelectors []*NamedQuerySelector
+
+func (s QuerySelectors) Find(name string) *NamedQuerySelector {
+	for _, n := range s {
+		if n.Name == name {
+			return n
+		}
+	}
+	return nil
+}
