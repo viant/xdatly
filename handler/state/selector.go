@@ -22,3 +22,8 @@ func (s *QuerySelector) CurrentOffset() int {
 func (s *QuerySelector) CurrentPage() int {
 	return s.Page
 }
+
+func (s *QuerySelector) SetCriteria(expanded string, placeholders []interface{}) {
+	s.Criteria = expanded
+	s.Placeholders = placeholders
+}
