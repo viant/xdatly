@@ -1,6 +1,7 @@
 package state
 
 import (
+	"database/sql"
 	"net/http"
 	"net/url"
 )
@@ -20,6 +21,7 @@ type (
 		httpRequest    *http.Request
 		constants      map[string]interface{}
 		input          interface{}
+		tx             *sql.Tx
 	}
 )
 
@@ -69,6 +71,10 @@ func (s *Options) Body() []byte {
 
 func (s *Options) Input() interface{} {
 	return s.input
+}
+
+func (s *Options) Tx() *sql.Tx {
+	return s.tx
 }
 
 // WithConstants returns option with constants
@@ -184,5 +190,11 @@ func WithBody(body []byte) Option {
 func WithQuerySelector(selectors ...*NamedQuerySelector) Option {
 	return func(o *Options) {
 		o.querySelectors = selectors
+	}
+}
+
+func WithTx(tx *sql.Tx) Option {
+	return func(o *Options) {
+		o.tx = tx
 	}
 }
