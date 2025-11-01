@@ -21,7 +21,7 @@ type (
 		httpRequest    *http.Request
 		constants      map[string]interface{}
 		input          interface{}
-		sqlTx          map[string]*sql.Tx
+		sqlTx          *sql.Tx
 	}
 )
 
@@ -73,7 +73,7 @@ func (s *Options) Input() interface{} {
 	return s.input
 }
 
-func (s *Options) SqlTx() map[string]*sql.Tx {
+func (s *Options) SqlTx() *sql.Tx {
 	return s.sqlTx
 }
 
@@ -193,11 +193,8 @@ func WithQuerySelector(selectors ...*NamedQuerySelector) Option {
 	}
 }
 
-func WithSqlTx(connector string, sqlTx *sql.Tx) Option {
+func WithSqlTx(sqlTx *sql.Tx) Option {
 	return func(o *Options) {
-		if len(o.sqlTx) == 0 {
-			o.sqlTx = make(map[string]*sql.Tx)
-		}
-		o.sqlTx[connector] = sqlTx
+		o.sqlTx = sqlTx
 	}
 }
