@@ -34,6 +34,10 @@ func (s Service) Bind(ctx context.Context, state interface{}, opt ...Option) err
 	return s.injector.Bind(ctx, state, opt...)
 }
 
+func (s Service) ValuesOf(ctx context.Context, any interface{}) (map[string]interface{}, error) {
+	return s.injector.ValuesOf(ctx, any)
+}
+
 func New(stater Injector) *Service {
 	return &Service{injector: stater}
 }
