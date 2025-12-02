@@ -2,16 +2,17 @@ package exec
 
 import (
 	"context"
-	"github.com/google/uuid"
-	"github.com/viant/scy/auth/jwt"
-	"github.com/viant/xdatly/handler/async"
-	"github.com/viant/xdatly/handler/response"
-	"github.com/viant/xdatly/handler/tracing"
 	"net/http"
 	"os"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/viant/scy/auth/jwt"
+	"github.com/viant/xdatly/handler/async"
+	"github.com/viant/xdatly/handler/response"
+	"github.com/viant/xdatly/handler/tracing"
 )
 
 type contextKey string
@@ -49,6 +50,12 @@ type Context struct {
 	jobs                       []*async.Job
 	values                     map[string]interface{}
 	IgnoreEmptyQueryParameters bool `json:"-"`
+}
+
+func (c *Context) AppendMetrics(metrics *response.Metric) {
+	c.mux.Lock()
+	defer c.mux.Unlock()
+	c.Metrics = append(c.Metrics, metrics)
 }
 
 func (c *Context) SetError(err error) {
