@@ -59,6 +59,11 @@ func (c *Context) AppendMetrics(metrics *response.Metric) {
 }
 
 func (c *Context) SetError(err error) {
+	if err == nil {
+		return
+	}
+	c.mux.Lock()
+	defer c.mux.Unlock()
 	c.Error = err.Error()
 	c.Status = "error"
 }
@@ -109,6 +114,8 @@ func (c *Context) EndTime() time.Time {
 }
 
 func (c *Context) AsyncElapsed() time.Duration {
+	c.mux.RLock()
+	defer c.mux.RUnlock()
 	if len(c.jobs) == 0 {
 		return 0
 	}
@@ -130,6 +137,8 @@ func (c *Context) AsyncElapsed() time.Duration {
 }
 
 func (c *Context) AsyncEndTime() *time.Time {
+	c.mux.RLock()
+	defer c.mux.RUnlock()
 	if len(c.jobs) == 0 {
 		return nil
 	}
@@ -147,6 +156,8 @@ func (c *Context) AsyncEndTime() *time.Time {
 }
 
 func (c *Context) AsyncCreationTime() *time.Time {
+	c.mux.RLock()
+	defer c.mux.RUnlock()
 	if len(c.jobs) == 0 {
 		return nil
 	}
@@ -160,6 +171,120 @@ func (c *Context) AsyncCreationTime() *time.Time {
 
 	}
 	return ret
+}
+
+// SnapshotForLogging creates a concurrency-safe snapshot of the context
+// that can be used for logging and tracing without holding internal locks.
+// It performs a shallow copy of the Context and deep copies of maps/slices
+// that are traversed by JSON marshalling or ToSpans.
+func (c *Context) SnapshotForLogging() *Context {
+	c.mux.RLock()
+	defer c.mux.RUnlock()
+
+	snapshot := *c
+
+	// Compute elapsed time for logging without mutating the live context.
+	snapshot.ElapsedMs = int(time.Since(c.StartTime).Milliseconds())
+
+	// Copy headers map.
+	if c.Header != nil {
+		headerCopy := make(map[string]string, len(c.Header))
+		for k, v := range c.Header {
+			headerCopy[k] = v
+		}
+		snapshot.Header = headerCopy
+	}
+
+	// Deep copy metrics (including nested executions) so that any
+	// transformations such as HideMetrics/HideSQL do not race with
+	// concurrent writers on the live context.
+	if c.Metrics != nil {
+		snapshot.Metrics = deepCopyMetrics(c.Metrics)
+	}
+
+	// Deep copy trace and its spans so logging can safely append
+	// spans and mutate attributes/status without touching the live trace.
+	if c.Trace != nil {
+		snapshot.Trace = deepCopyTrace(c.Trace)
+	}
+
+	// jobs, values and internal mutex are not used by logging and are
+	// intentionally left as-is (or omitted from JSON), so no extra work
+	// is required for them here.
+	return &snapshot
+}
+
+func deepCopyMetrics(src response.Metrics) response.Metrics {
+	if src == nil {
+		return nil
+	}
+	result := make(response.Metrics, len(src))
+	for i, metric := range src {
+		if metric == nil {
+			continue
+		}
+		clonedMetric := *metric
+		// Deep copy executions slice and its elements.
+		if metric.Executions != nil {
+			executionsCopy := make(response.SQLExecutions, len(metric.Executions))
+			for j, exec := range metric.Executions {
+				if exec == nil {
+					continue
+				}
+				clonedExec := *exec
+				// Deep copy args slice.
+				if exec.Args != nil {
+					argsCopy := make([]interface{}, len(exec.Args))
+					copy(argsCopy, exec.Args)
+					clonedExec.Args = argsCopy
+				}
+				// Deep copy cache stats to decouple from the original.
+				if exec.CacheStats != nil {
+					cacheCopy := *exec.CacheStats
+					clonedExec.CacheStats = &cacheCopy
+				}
+				executionsCopy[j] = &clonedExec
+			}
+			clonedMetric.Executions = executionsCopy
+		}
+		result[i] = &clonedMetric
+	}
+	return result
+}
+
+func deepCopyTrace(src *tracing.Trace) *tracing.Trace {
+	if src == nil {
+		return nil
+	}
+	traceCopy := *src
+
+	// Deep copy resource info.
+	if src.Resource != nil {
+		resourceCopy := *src.Resource
+		traceCopy.Resource = &resourceCopy
+	}
+
+	// Deep copy spans and their attribute maps.
+	if src.Spans != nil {
+		spansCopy := make([]*tracing.Span, len(src.Spans))
+		for i, span := range src.Spans {
+			if span == nil {
+				continue
+			}
+			spanCopy := *span
+			if span.Attributes != nil {
+				attrsCopy := make(map[string]string, len(span.Attributes))
+				for k, v := range span.Attributes {
+					attrsCopy[k] = v
+				}
+				spanCopy.Attributes = attrsCopy
+			}
+			spansCopy[i] = &spanCopy
+		}
+		traceCopy.Spans = spansCopy
+	}
+
+	return &traceCopy
 }
 
 func (c *Context) AppendJob(job *async.Job) {
