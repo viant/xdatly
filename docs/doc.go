@@ -1,2 +1,2 @@
-// Package docs defines provider/service interface to handle code documentation
+// Package docs holds reduced public docs-provider contracts.
 package docs

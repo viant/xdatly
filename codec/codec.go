@@ -5,21 +5,23 @@ import (
 	"reflect"
 )
 
-type (
-	Config struct {
-		Body       string
-		InputType  reflect.Type `json:"-" yaml:"-"`
-		Args       []string
-		OutputType string
-		//Optional builder
-	}
+// Config describes the exact source and destination contract for a codec.
+type Config struct {
+	Body                 string
+	SourceType           reflect.Type `json:"-" yaml:"-"`
+	DestinationType      reflect.Type `json:"-" yaml:"-"`
+	Args                 []string
+	OutputTypeExpression string
+}
 
-	Factory interface {
-		New(codecConfig *Config, options ...Option) (Instance, error)
-	}
+// Factory creates codec instances from config plus options during registration.
+type Factory interface {
+	New(codecConfig *Config, options ...Option) (Instance, error)
+}
 
-	Instance interface {
-		ResultType(inputType reflect.Type) (reflect.Type, error)
-		Value(ctx context.Context, raw interface{}, options ...Option) (interface{}, error)
-	}
-)
+// Instance is the reduced public codec execution contract. Registered instances
+// may be shared by concurrent invocations: Value must be concurrency-safe and
+// must not retain invocation context, record pointers, or lookup options.
+type Instance interface {
+	Value(ctx context.Context, raw interface{}, options ...Option) (interface{}, error)
+}

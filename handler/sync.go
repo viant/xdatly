@@ -2,7 +2,12 @@ package handler
 
 import "sync"
 
-// DataSync represents data sync
+type syncKey string
+
+// DataSync coordinates cross-view hook ordering. A relation registers its
+// Holder key before fetching begins (Put), releases it when data is ready
+// (Delete), and dependents block in Wait until the lock is released.
+// Ported faithfully from xdatly/handler/sync.go.
 type DataSync struct {
 	aMap map[string]*sync.RWMutex
 	rw   sync.RWMutex
@@ -36,6 +41,8 @@ func (d *DataSync) Delete(key string) {
 	}
 }
 
+// Wait blocks until the named relation's data is available.
+// Returns false when the key was never Put (no-op is safe).
 func (d *DataSync) Wait(key string) bool {
 	d.rw.RLock()
 	lock, ok := d.aMap[key]
@@ -53,3 +60,7 @@ func NewDataSync() *DataSync {
 		aMap: make(map[string]*sync.RWMutex),
 	}
 }
+
+// DataSyncKey is the context key used to carry *DataSync through hooks that
+// coordinate sibling view readiness.
+const DataSyncKey = syncKey("dataSync")

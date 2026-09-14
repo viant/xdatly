@@ -1,39 +1,12 @@
 package handler
 
 import (
-	"context"
-	"github.com/viant/xdatly/handler/auth"
-	"github.com/viant/xdatly/handler/differ"
-	"github.com/viant/xdatly/handler/http"
-	"github.com/viant/xdatly/handler/logger"
-	"github.com/viant/xdatly/handler/mbus"
-	"github.com/viant/xdatly/handler/sqlx"
-	"github.com/viant/xdatly/handler/state"
-	"github.com/viant/xdatly/handler/validator"
+	"github.com/viant/xdatly/response"
 )
 
-type (
-	key      string
-	inputKey string
-
-	syncKey string
-)
-
-const (
-	Key         = key("session")
-	InputKey    = inputKey("input")
-	DataSyncKey = syncKey("dataSync")
-)
-
+// Session is the reduced per-invocation custom-handler facade.
+// It stays intentionally small to avoid recreating the old fat session surface.
 type Session interface {
-	Validator() *validator.Service
-	Differ() *differ.Service
-	MessageBus() *mbus.Service
-	Db(opts ...sqlx.Option) (*sqlx.Service, error)
-	Stater() *state.Service
-	FlushTemplate(ctx context.Context) error
-	Session(ctx context.Context, route *http.Route, opts ...state.Option) (Session, error)
-	Http() http.Http
-	Auth() auth.Auth
-	Logger() logger.Logger
+	Binder() Binder
+	Response() response.Writer
 }
