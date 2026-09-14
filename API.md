@@ -1,5 +1,8 @@
 # Public API Guide
 
+Start with [your role](ROLES.md), or the [reader and cube guide](READERS.md) for
+row-hook ordering, view selectors and composition.
+
 This guide covers the exported contract surface in `github.com/viant/xdatly`
 for the Datly 1.0 SDK. It is organized by concern rather than package listing:
 component authors can start with handlers and sessions, while runtime and
@@ -269,7 +272,9 @@ selector to a named view, and [`state.Selectors`](state/selector.go) provides
 `Find` and `Clone`.
 
 Selectors are exposed through the binder with `handler.SelectorsKey`. The SDK
-does not define a separate reader input channel.
+does not define a separate reader input channel, and this branch does not export
+a type named `reader.QuerySelector`; the public query-selector payload is
+`state.Selector`.
 
 Read provenance contracts live in [`handler/read_metadata.go`](handler/read_metadata.go):
 

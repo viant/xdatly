@@ -6,7 +6,8 @@
 
 [Package documentation](https://pkg.go.dev/github.com/viant/xdatly) ·
 [Public API guide](API.md) ·
-[Architecture](ARCHITECTURE.md) · [Migration](MIGRATION.md) ·
+[Architecture](ARCHITECTURE.md) · [Roles](ROLES.md) ·
+[Reader and cube authors](READERS.md) · [Migration](MIGRATION.md) ·
 [Contributing](CONTRIBUTING.md) · [Releases](RELEASING.md)
 
 `xdatly` is the public Go SDK for Datly 1.0 contracts. It gives application
@@ -142,6 +143,8 @@ go test ./...
 
 - [Architecture](ARCHITECTURE.md): dependency direction, invocation and ownership.
 - [Public API guide](API.md): public contracts grouped by component concern.
+- [Roles](ROLES.md): component, reader, cube, handler, mutation and extension authors.
+- [Reader and cube guide](READERS.md): row hooks, selectors, grouping and composition.
 - [Migration](MIGRATION.md): moving from the previous SDK layout to v1.
 - [Contributing](CONTRIBUTING.md): development checks and change guidance.
 - [Releases](RELEASING.md): branches, module identity and publication order.
