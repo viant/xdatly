@@ -123,10 +123,9 @@ substitute for the registered cube sources.
 
 Configure cube-count, result and timeout budgets in the matching Datly report
 API. Composition must also respect the database's combined placeholder limit.
-The current standalone source snapshot requires report registration through an
-embedding host; report metadata alone does not activate derived endpoints in
-the standalone loader. Check the matching Datly release's report guide before
-using this feature in a deployment.
+Configured standalone builds can register the source reader, derived cube and
+opt-in composition from the authored metadata. Check the matching Datly release's
+report guide for configuration and remaining automatic-linking boundaries.
 
 ## Verify behavior
 
