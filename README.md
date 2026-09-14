@@ -1,5 +1,13 @@
 # xdatly
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/viant/xdatly.svg)](https://pkg.go.dev/github.com/viant/xdatly)
+[![Go Version](https://img.shields.io/badge/Go-1.25%2B-00ADD8?logo=go)](go.mod)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
+[Package documentation](https://pkg.go.dev/github.com/viant/xdatly) ·
+[Architecture](ARCHITECTURE.md) · [Migration](MIGRATION.md) ·
+[Contributing](CONTRIBUTING.md) · [Releases](RELEASING.md)
+
 Public Go contracts for Datly 1.0: build typed components, implement handlers and
 share the same application contracts across HTTP and MCP.
 
