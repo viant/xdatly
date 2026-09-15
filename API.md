@@ -233,8 +233,20 @@ write committed.
 | `handler.AfterQueueHook[T, P]` | Optional hook after mutation work is queued |
 | `handler.WriteHook[T, P]` | Optional `BeforeWrite` customization with `WriteInsert` or `WriteUpdate` |
 
-`handler.NoParent` is the root parent type. `WriteInsert` and `WriteUpdate` are
-planned write actions, not completion states.
+`handler.NoParent` is the root parent type. `WriteInsert`, `WriteUpdate` and
+`WriteDelete` identify planned actions. Completion is reported separately through
+`handler.Outcome`.
+
+Generated writers select `WriteDelete` only from an explicit DQL
+`delete_marker(view.column)` and a complete client-supplied identity matched to
+an authorized Previous row. Omitting a row or collection does not request deletion.
+Deletion uses the existing `handler.DML.Delete` capability.
+
+[`handler.Conflict`](handler/conflict.go) carries `Entity`, `Field` and `Reason`
+and reports HTTP status 409 through `StatusCode()`, including when wrapped.
+Generated `concurrency_token(view.column)` checks compare captured client values
+with Previous at the start of validation. They do not add database locks or
+compare-and-write predicates; another writer can change the row after validation.
 
 Generated mutation policy contracts live in
 [`handler/mutation/program.go`](handler/mutation/program.go):
