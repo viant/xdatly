@@ -92,6 +92,7 @@ type WriteAction string
 const (
 	WriteInsert WriteAction = "insert"
 	WriteUpdate WriteAction = "update"
+	WriteDelete WriteAction = "delete"
 )
 
 // WriteHook optionally customizes business values before validation, using
