@@ -59,31 +59,45 @@ type EntityState[T, P any] struct {
 	SelfParent     *T
 }
 
+// LifecycleContext contains the typed state and component output available to
+// one entity lifecycle callback. Output is the invocation-owned response value
+// allocated before lifecycle processing begins. Hooks may use it to accumulate
+// validation violations, warnings and other response metadata. Hooks must not
+// retain Output after the callback or use it concurrently.
+//
+// EntityState is embedded so existing state access remains direct: callbacks
+// continue to use state.Previous, state.Parent, state.Original and
+// state.SelfParent while gaining state.Output.
+type LifecycleContext[T, P, O any] struct {
+	EntityState[T, P]
+	Output *O
+}
+
 // EntityHooks is implemented by a reusable, invocation-scoped hook object.
 // Init runs after initial presence synchronization and invariant backfill; it
 // uses marker-aware setters when changing business values. Validate then runs
 // on the same object and must not mutate values,
 // markers or the previous snapshot. Component adapters supply input-specific
-// configuration and scoped services without coupling reusable entities to an
-// application input type.
-type EntityHooks[T, P any] interface {
-	Init(context.Context, *T, EntityState[T, P]) error
-	Validate(context.Context, *T, EntityState[T, P]) error
+// configuration, scoped services and the invocation-owned typed output without
+// coupling entity types themselves to an application contract.
+type EntityHooks[T, P, O any] interface {
+	Init(context.Context, *T, LifecycleContext[T, P, O]) error
+	Validate(context.Context, *T, LifecycleContext[T, P, O]) error
 }
 
 // AfterSequenceHook is an optional capability of the same invocation-scoped
 // EntityHooks object. The generated program calls it after sequencing and before
 // diffing. Validated business values and their markers must remain unchanged;
 // only identity/link processing allowed by the compiled policy may adjust rows.
-type AfterSequenceHook[T, P any] interface {
-	AfterSequence(context.Context, *T, EntityState[T, P]) error
+type AfterSequenceHook[T, P, O any] interface {
+	AfterSequence(context.Context, *T, LifecycleContext[T, P, O]) error
 }
 
 // AfterQueueHook observes successfully queued mutation work. Queueing is not a
 // commit: publishing commit-dependent messages belongs to outcome-aware
 // finalization, not this hook. The same object also serves Init and Validate.
-type AfterQueueHook[T, P any] interface {
-	AfterQueue(context.Context, *T, EntityState[T, P]) error
+type AfterQueueHook[T, P, O any] interface {
+	AfterQueue(context.Context, *T, LifecycleContext[T, P, O]) error
 }
 
 // WriteAction is a planned operation, not evidence that a write was committed.

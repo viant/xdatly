@@ -228,9 +228,9 @@ write committed.
 | `handler.OriginalPresence` | Original marker availability and field presence |
 | `handler.EntitySnapshot[T]` | Detached pre-initialization snapshot with `SyncPresence(current)` |
 | `handler.EntityState[T, P]` | Previous value, parent, self-parent and field evidence for one entity operation |
-| `handler.EntityHooks[T, P]` | Reusable invocation-scoped `Init` and `Validate` hook object |
-| `handler.AfterSequenceHook[T, P]` | Optional hook after sequencing and before diffing |
-| `handler.AfterQueueHook[T, P]` | Optional hook after mutation work is queued |
+| `handler.EntityHooks[T, P, O]` | Reusable invocation-scoped `Init` and `Validate` hook object with typed component output access |
+| `handler.AfterSequenceHook[T, P, O]` | Optional hook after sequencing and before diffing |
+| `handler.AfterQueueHook[T, P, O]` | Optional hook after mutation work is queued |
 | `handler.WriteHook[T, P]` | Optional `BeforeWrite` customization with `WriteInsert` or `WriteUpdate` |
 
 `handler.NoParent` is the root parent type. `WriteInsert`, `WriteUpdate` and
