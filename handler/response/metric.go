@@ -35,6 +35,7 @@ type (
 		ErrorType      string     `json:"errorType,omitempty"`
 		ErrorCode      int        `json:"errorCode,omitempty"`
 		ExpiryTime     *time.Time `json:"expiryTime,omitempty"`
+		CreatedTime    *time.Time `json:"createdTime,omitempty"`
 	}
 
 	SQLExecutions []*SQLExecution
@@ -240,4 +241,13 @@ func (m Metrics) ToSpans(ownerID *string) []*tracing.Span {
 		}
 	}
 	return spans
+}
+
+// SetCreatedTime records a detached creation timestamp from a native cache.
+func (s *CacheStats) SetCreatedTime(value *time.Time) {
+	s.CreatedTime = nil
+	if value != nil {
+		copy := *value
+		s.CreatedTime = &copy
+	}
 }
