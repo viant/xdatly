@@ -22,6 +22,36 @@ type DML interface {
 	Execute(statement string, args ...any) error
 }
 
+// Match identifies the mapped column and persisted value required by an
+// atomic update or delete. The new value remains in the write record.
+type Match struct {
+	Column string
+	Value  any
+}
+
+// Options configures one buffered update or delete.
+type Options struct {
+	IfMatch *Match
+}
+
+// Option applies one per-write setting.
+type Option func(*Options)
+
+// WithIfMatch requires the mapped column to equal the supplied persisted
+// value in the same SQL statement as the update or delete.
+func WithIfMatch(column string, value any) Option {
+	return func(options *Options) {
+		options.IfMatch = &Match{Column: column, Value: value}
+	}
+}
+
+// MatchedDML is an optional extension for atomic versioned writes. Existing
+// DML implementations remain source-compatible; versioned writers require it.
+type MatchedDML interface {
+	UpdateWithOptions(table string, value any, options ...Option) error
+	DeleteWithOptions(table string, value any, options ...Option) error
+}
+
 // Sequencer allocates identifiers before buffered writes are flushed.
 type Sequencer interface {
 	Allocate(ctx context.Context, table string, dest any, selector string) error

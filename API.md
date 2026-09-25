@@ -150,6 +150,7 @@ The focused data contracts live in [`handler/data.go`](handler/data.go):
 | Interface | Methods |
 | --- | --- |
 | `handler.DML` | `Insert(table, value)`, `Update(table, value)`, `Delete(table, value)`, `Execute(statement, args...)` |
+| `handler.MatchedDML` | `UpdateWithOptions(table, value, options...)`, `DeleteWithOptions(table, value, options...)` |
 | `handler.Sequencer` | `Allocate(ctx, table, dest, selector)` |
 | `handler.Flusher` | `Flush(ctx, table)` |
 | `handler.Data` | Embeds `DML`, `Sequencer` and `Flusher` |
@@ -240,13 +241,22 @@ write committed.
 Generated writers select `WriteDelete` only from an explicit DQL
 `delete_marker(view.column)` and a complete client-supplied identity matched to
 an authorized Previous row. Omitting a row or collection does not request deletion.
-Deletion uses the existing `handler.DML.Delete` capability.
+Unversioned deletion uses `handler.DML.Delete`. A row with a generated
+`concurrency_token` requires a client-supplied token and the optional
+`handler.MatchedDML` capability. The writer passes `WithIfMatch` so the token
+is checked in the SQL `DELETE` itself.
 
 [`handler.Conflict`](handler/conflict.go) carries `Entity`, `Field` and `Reason`
 and reports HTTP status 409 through `StatusCode()`, including when wrapped.
 Generated `concurrency_token(view.column)` checks compare captured client values
-with Previous at the start of validation. They do not add database locks or
-compare-and-write predicates; another writer can change the row after validation.
+with Previous at the start of validation. The optional `handler.MatchedDML`
+capability queues an update or delete with `WithIfMatch(column, previousValue)`.
+The SQL statement compares that token in its WHERE clause and requires exactly
+one affected row. A later competing write returns `handler.Conflict`; no
+database-specific row lock is required. Ordinary `DML` implementations remain
+source-compatible; a versioned writer fails closed if `MatchedDML` is absent.
+Applications or databases must advance the token on success; the framework
+does not invent a next version.
 
 Generated mutation policy contracts live in
 [`handler/mutation/program.go`](handler/mutation/program.go):
