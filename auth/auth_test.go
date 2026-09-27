@@ -16,8 +16,8 @@ func (testAuthenticator) Authenticate(_ context.Context, token Token) (Principal
 }
 
 func TestAuthContractCompile(t *testing.T) {
-	var _ Authenticator = testAuthenticator{}
-	if VendorJWT != "jwt" || VendorCognito != "cognito" || VendorFirebase != "firebase" {
+	var _ TokenAuthenticator = testAuthenticator{}
+	if VendorDefault != "default" || VendorJWT != "jwt" || VendorCognito != "cognito" || VendorFirebase != "firebase" {
 		t.Fatalf("expected vendor constants to be preserved")
 	}
 	if !errors.Is(ErrInvalidToken, ErrInvalidToken) || !errors.Is(ErrExpiredToken, ErrExpiredToken) {
