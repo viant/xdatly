@@ -52,6 +52,9 @@ type EntitySnapshot[T any] interface {
 // Original identity presence is independent
 // from any identifier assigned later by initialization or sequencing.
 type EntityState[T, P any] struct {
+	// Location is the canonical Go input graph path for this invocation row,
+	// including collection indexes. It is not a JSON alias or a table name.
+	Location       string `json:"-" format:"-"`
 	Previous       *T
 	Parent         *P
 	Original       OriginalPresence

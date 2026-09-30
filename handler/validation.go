@@ -11,6 +11,12 @@ type Violation struct {
 	Field    string `json:"field,omitempty"`
 	Message  string `json:"message,omitempty"`
 	Check    string `json:"check,omitempty"`
+	// CheckedValue is the validator's checked fact, not a public payload field.
+	// Applications may explicitly project it after applying their own exposure
+	// policy. Default JSON serialization must never expose this diagnostic.
+	CheckedValue any `json:"-" format:"-"`
+	// HasCheckedValue distinguishes a checked null from absent value evidence.
+	HasCheckedValue bool `json:"-" format:"-"`
 }
 
 // Validation is the typed result shared by Go and template validation consumers.
