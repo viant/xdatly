@@ -25,10 +25,14 @@ type ValidationOptions struct {
 	// zero values from a partial projection. Inserts require nil.
 	PreviousFields FieldSet
 	// Fields is effective validation coverage, not the persistence Has mask.
-	// Inserts require nil (complete checks). Updates require explicit coverage;
+	// Inserts require nil unless HonorPresence is enabled. Updates require explicit coverage;
 	// invariant-backfilled fields may be covered without becoming client writes.
 	// Names are canonical Go field names, as with EntityState.PreviousFields.
 	Fields FieldSet
+	// HonorPresence enables supplied-field coverage for an INSERT business pass.
+	// It requires Fields and forbids Previous evidence. Generated writers always
+	// run a complete final validation pass before queuing the write.
+	HonorPresence bool
 	// DeferredFields identifies unavailable INSERT inputs for a generated
 	// business-validation pass. It is not a sparse write mask. Only compiled
 	// producer authority and original absence may supply this set; a mandatory
