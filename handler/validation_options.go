@@ -16,6 +16,11 @@ const FrameworkValidatorKey ValueKey = "frameworkValidator"
 // location; candidates in a batch must share the entity type and connector.
 type ValidationOptions struct {
 	Action WriteAction
+	// CheckUnique and CheckRef select native database checks for this pass.
+	// Nil preserves the default true. Required and Go checks remain active
+	// under Fields/DeferredFields. Generated final passes always enable both.
+	CheckUnique *bool
+	CheckRef    *bool
 	// Previous is the detached typed database row matched using original
 	// identity. Inserts require nil; updates require a row with its complete
 	// mapped identity. Unique checks exclude that tuple, never working IDs.
