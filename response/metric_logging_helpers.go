@@ -34,6 +34,18 @@ func (m *Metric) HideSQL() *Metric {
 		copy := *elem
 		copy.SQL = ""
 		copy.Args = nil
+		if elem.CacheStats != nil {
+			cache := *elem.CacheStats
+			if cache.ExpiryTime != nil {
+				value := *cache.ExpiryTime
+				cache.ExpiryTime = &value
+			}
+			if cache.CreatedTime != nil {
+				value := *cache.CreatedTime
+				cache.CreatedTime = &value
+			}
+			copy.CacheStats = &cache
+		}
 		ret.Executions[index] = &copy
 	}
 	return &ret
@@ -77,7 +89,8 @@ func (s *SQLExecution) ToSpan(viewName string) *tracing.Span {
 	name := "SQL Select: " + strings.Trim(viewName, "#")
 	var parentID *string
 	if s.ParentID != "" {
-		parentID = &s.ParentID
+		value := s.ParentID
+		parentID = &value
 	}
 	return &tracing.Span{
 		SpanID:       id,
@@ -104,9 +117,14 @@ func (m Metrics) ToSpans(ownerID *string) []*tracing.Span {
 		case "UPDATE":
 			name = "SQL Update: " + strings.Trim(metric.View, "#")
 		}
+		var parentID *string
+		if ownerID != nil {
+			value := *ownerID
+			parentID = &value
+		}
 		span := tracing.Span{
 			SpanID:       metric.ID,
-			ParentSpanID: ownerID,
+			ParentSpanID: parentID,
 			Name:         name,
 			Kind:         "CLIENT",
 			StartTime:    metric.StartTime,
@@ -131,7 +149,8 @@ func (m Metrics) ToSpans(ownerID *string) []*tracing.Span {
 			}
 			execSpan := exec.ToSpan(metric.View)
 			if execSpan.ParentSpanID == nil {
-				execSpan.ParentSpanID = &metric.ID
+				value := metric.ID
+				execSpan.ParentSpanID = &value
 			}
 			if exec.Error != "" {
 				execSpan.Status.Code = tracing.StatusError

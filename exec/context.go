@@ -53,6 +53,7 @@ type Context struct {
 	values map[string]any
 
 	parentSpanID *string
+	completed    bool
 }
 
 // Option mutates the generic execution context shape.
@@ -190,13 +191,18 @@ func (c *Context) SnapshotForLogging() *Context {
 	c.mux.RLock()
 	defer c.mux.RUnlock()
 
+	elapsedMs := c.ElapsedMs
+	if !c.completed {
+		elapsedMs = int(time.Since(c.StartTime).Milliseconds())
+	}
 	snapshot := &Context{
 		Method:     c.Method,
 		URI:        c.URI,
 		StatusCode: c.StatusCode,
 		Status:     c.Status,
 		Error:      c.Error,
-		ElapsedMs:  int(time.Since(c.StartTime).Milliseconds()),
+		ElapsedMs:  elapsedMs,
+		completed:  c.completed,
 		StartTime:  c.StartTime,
 		TraceID:    c.TraceID,
 	}
@@ -252,6 +258,14 @@ func deepCopyMetrics(src response.Metrics) response.Metrics {
 				}
 				if exec.CacheStats != nil {
 					cacheCopy := *exec.CacheStats
+					if cacheCopy.ExpiryTime != nil {
+						value := *cacheCopy.ExpiryTime
+						cacheCopy.ExpiryTime = &value
+					}
+					if cacheCopy.CreatedTime != nil {
+						value := *cacheCopy.CreatedTime
+						cacheCopy.CreatedTime = &value
+					}
 					clonedExec.CacheStats = &cacheCopy
 				}
 				executionsCopy[j] = &clonedExec
@@ -279,6 +293,10 @@ func deepCopyTrace(src *tracing.Trace) *tracing.Trace {
 				continue
 			}
 			spanCopy := *span
+			if span.ParentSpanID != nil {
+				value := *span.ParentSpanID
+				spanCopy.ParentSpanID = &value
+			}
 			if span.Attributes != nil {
 				attrsCopy := make(map[string]string, len(span.Attributes))
 				for k, v := range span.Attributes {

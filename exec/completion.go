@@ -10,6 +10,7 @@ func (c *Context) Complete(end time.Time, err error) {
 	}
 	c.mux.Lock()
 	defer c.mux.Unlock()
+	c.completed = true
 	c.ElapsedMs = int(end.Sub(c.StartTime).Milliseconds())
 	if c.Trace != nil && len(c.Trace.Spans) > 0 && c.Trace.Spans[0] != nil {
 		root := c.Trace.Spans[0]
