@@ -112,6 +112,25 @@ const (
 	WriteDelete WriteAction = "delete"
 )
 
+// WriteEligibilityHook is an optional capability of the invocation-scoped
+// lifecycle object for a physical INSERT/UPDATE root without writable
+// descendants. Read-only auxiliary relations remain available to the hook.
+// It runs once per applicable row after allocation, AfterSequence and identity
+// reconciliation, before final validation and physical queueing. Returning false
+// suppresses physical DML and AfterQueue only; validation, allocated identities,
+// body membership and output are retained. Errors abort the invocation.
+//
+// The callback is read-only: it must not change any row, marker, association,
+// Original, Previous or Output, invoke persistence or publish side effects.
+// Managed mutation capabilities and writer state are checked by the runtime;
+// arbitrary SQL, retained raw database handles and external services remain
+// trusted Go subject to this contract. Invocation-local bookkeeping is allowed.
+// The synchronous callback must not retain invocation state or capabilities or
+// launch mutation work for later. Decisions are recomputed on each retry.
+type WriteEligibilityHook[T, P, O any] interface {
+	WriteEligible(context.Context, *T, LifecycleContext[T, P, O], WriteAction) (bool, error)
+}
+
 // WriteHook optionally customizes business values before validation, using
 // marker-aware setters after initial synchronization. Identity reconciliation after diffing is a
 // separate phase; this hook is not a commit or message-publication callback.
