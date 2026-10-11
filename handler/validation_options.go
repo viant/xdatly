@@ -1,8 +1,8 @@
 package handler
 
-// FrameworkValidatorKey is reserved for the mandatory generated validation
-// phase. It uses the same Validator interface, but cannot be replaced by request
-// values or the optional custom-handler Validator capability.
+// FrameworkValidatorKey is the protected native validation capability used by
+// generated writers and trusted application-owned buffered writers. It cannot
+// be replaced by request values or the optional custom-handler Validator.
 const FrameworkValidatorKey ValueKey = "frameworkValidator"
 
 // ValidationOptions supplies mutation policy to the scoped Validator capability.
@@ -15,7 +15,14 @@ const FrameworkValidatorKey ValueKey = "frameworkValidator"
 // Batch policies retain each candidate's matched prior row and diagnostic
 // location; candidates in a batch must share the entity type and connector.
 type ValidationOptions struct {
-	Action WriteAction
+	// CheckOnly validates selected Go, not-null and reference constraints on an
+	// associated value that is not being mutated. It requires empty Action,
+	// explicit Fields, Shallow and CheckUnique=false. Mutation provenance,
+	// HonorPresence, deferrals and satisfied references are forbidden. It uses
+	// the scoped connection/transaction without flushing queued DML. Batches
+	// currently reject this mode; use one typed entity per call.
+	CheckOnly bool
+	Action    WriteAction
 	// CheckUnique and CheckRef select native database checks for this pass.
 	// Nil preserves the default true. Required and Go checks remain active
 	// under Fields/DeferredFields. Generated final passes always enable both.
@@ -45,9 +52,11 @@ type ValidationOptions struct {
 	// UPDATE and calls with SatisfiedReferences cannot defer fields.
 	DeferredFields FieldSet
 	// SatisfiedReferences identifies exact reference-existence checks already
-	// proven by the generated pending-write graph for an INSERT payload. Other
-	// constraints remain active. The generated owner must prove matching typed
-	// parent keys, INSERT action and write order in the same transaction scope.
+	// proven for an INSERT payload. Other constraints remain active. A generated
+	// owner or trusted application-owned buffered writer must successfully queue
+	// the exact typed parent INSERT through the same invocation DML owner, prove
+	// its earlier order and table, match captured parent/child keys through native
+	// reference matching, and preserve those bindings until completion.
 	// These are trusted framework facts, never request-bindable assertions.
 	SatisfiedReferences []ValidationReference
 	// Connector selects a configured connector within the invocation scope.
