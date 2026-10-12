@@ -158,3 +158,10 @@ and private application data before sharing diagnostics.
 Licensed under the **Apache License, Version 2.0**. See [LICENSE](LICENSE) for the
 full terms. The original repository license is retained unchanged. Dependencies
 retain their own licenses and notices.
+
+## Credits and Acknowledgements
+
+**Library Authors:**
+
+- Kamil Larysz
+- Adrian Witas
