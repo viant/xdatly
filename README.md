@@ -153,6 +153,43 @@ Report reproducible bugs and feature requests in the repository issue tracker.
 Include the SDK revision, Go version and a minimal example; remove credentials
 and private application data before sharing diagnostics.
 
+## Scoped component composition
+
+Application handlers use `github.com/viant/xdatly/handler` contracts. Resolve the
+existing invocation capability through the session binder and await each call:
+
+```go
+value, found, err := session.Binder().Lookup(ctx, handler.ComponentInvokerKey)
+if err != nil { return err }
+invoker, ok := value.(handler.ComponentInvoker)
+if !found || !ok { return errors.New("component invoker unavailable") }
+result, err := invoker.Invoke(ctx, handler.ComponentRequest{
+    Target: handler.ComponentTarget{
+        Scope: "example.com/service/reports", Name: "summary",
+        Method: "GET", Path: "/summary",
+    },
+})
+```
+
+The target is fixed by application code, rather than chosen from transport input.
+`Input` supplies a trusted canonical generated component input. `ExtraInput:
+handler.WithInput(seed)` requests marked reader-input reuse; it is not transport
+replay or proof that credentials have been verified. Provider overlays preserve
+Bindly's existing typed resolution semantics. Runtime-specific invocation options
+remain in the runtime adapter.
+
+Calls inherit the runtime's ownership policy and existing buffered unit of work.
+They do not independently flush or commit the caller's writes. Do not retain an
+invoker for use after the root invocation completes. The optional `Completion`
+callback supplies actual `handler.Outcome` evidence; inspect `CommitConfirmed()`
+before treating work as committed. `handler.MutationReporter` exposes detached
+execution evidence, rather than a transaction handle or a planned write.
+
+Use a release containing these public contracts together with its matching
+runtime adapter. Datly retains its previous seed and mutation-report names as
+source-compatible aliases; reflection-qualified type names now identify Xdatly.
+Publish the SDK dependency before pinning the corresponding runtime release.
+
 ## License
 
 Licensed under the **Apache License, Version 2.0**. See [LICENSE](LICENSE) for the
