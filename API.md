@@ -178,6 +178,8 @@ output or row types may implement:
 
 | Interface | Called for |
 | --- | --- |
+| `handler.InvokerInitializer` | Input preparation via `Init(ctx, invoker)`; preferred for prerequisite component calls |
+| `handler.InvokerFinalizer` | Output composition via `Finalize(ctx, invoker)` before transaction completion |
 | `handler.Initializer` | Request-context initialization via `Init(ctx)` |
 | `handler.Finalizer` | Success-path follow-up via `Finalize(ctx)` |
 | `handler.ErrorFinalizer` | Error-aware completion via `Finalize(ctx, err)` |

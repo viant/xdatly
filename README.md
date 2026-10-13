@@ -155,8 +155,27 @@ and private application data before sharing diagnostics.
 
 ## Scoped component composition
 
-Application handlers use `github.com/viant/xdatly/handler` contracts. Resolve the
-existing invocation capability through the session binder and await each call:
+Application handlers use `github.com/viant/xdatly/handler` contracts. For lifecycle
+composition, prefer the separate `handler.InvokerInitializer` and
+`handler.InvokerFinalizer` interfaces:
+
+```go
+type InvokerInitializer interface {
+    Init(ctx context.Context, invoker handler.ComponentInvoker) error
+}
+type InvokerFinalizer interface {
+    Finalize(ctx context.Context, invoker handler.ComponentInvoker) error
+}
+```
+
+Each is optional and independent. These arguments keep capabilities out of Input
+fields. Initialization runs before execution; invoker-aware output finalization
+runs before transaction completion, separately from outcome observation. Await
+child calls and do not retain these callback-scoped invokers. Plain lifecycle
+forms and field injection remain supported.
+
+Inside handler Exec, resolve the invocation capability through the session binder
+and await each call:
 
 ```go
 value, found, err := session.Binder().Lookup(ctx, handler.ComponentInvokerKey)

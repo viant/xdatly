@@ -61,7 +61,11 @@ rows in the database. Keep hook work appropriate to a read path; a hook may also
 be exercised by nested reads, warmup or retries according to runtime policy.
 Do not make externally visible publication depend on counting hook invocations.
 
-Input `Initializer.Init(context.Context) error` and output finalization are
+Input `InvokerInitializer.Init(context.Context, ComponentInvoker) error` is
+preferred when initialization invokes prerequisites; plain
+`Initializer.Init(context.Context) error` remains supported. Output
+`InvokerFinalizer.Finalize(context.Context, ComponentInvoker) error` composes
+children before transaction completion. Input initialization and output finalization are
 invocation lifecycle hooks, separate from per-row hooks. Error-aware and
 injector-aware finalization contracts are defined in the handler package. Choose
 the contract supported by the runtime invocation instead of manually calling

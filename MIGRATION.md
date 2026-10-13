@@ -50,3 +50,22 @@ input binding, handler execution, output/error handling and transaction completi
 For exposed components, verify HTTP/MCP behavior as well as compilation. Check
 initialization/finalization hooks, sparse inputs, null values and any async replay
 or message publication the application uses.
+
+## Optional invoker lifecycle arguments
+
+The existing `handler.Initializer`, `handler.Finalizer`, and
+`handler.ErrorFinalizer` names and method signatures remain unchanged. Their
+source declarations now live in `handler/initializer.go` and
+`handler/finalizer.go`; imports stay `github.com/viant/xdatly/handler`.
+`InjectorFinalizer`, MCP hooks, and `component_invoker` field injection remain
+supported. Existing application hooks do not require migration.
+
+New input/output scaffolds use the independent `InvokerInitializer` and
+`InvokerFinalizer` interfaces. When adopting them, remove the invoker field only
+if no other application method uses it. Input `Init(ctx, invoker)` runs before
+execution. Output `Finalize(ctx, invoker)` composes children before transaction
+completion; it is not a timing-equivalent replacement for post-completion
+`Finalize(ctx)`. Keep commit-dependent publication in the outcome callback.
+Go cannot overload methods: choose one Init signature per input type and one
+Finalize signature per output type. Regeneration preserves existing authored
+lifecycle files.

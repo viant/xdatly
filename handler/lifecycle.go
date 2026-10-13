@@ -2,26 +2,6 @@ package handler
 
 import "context"
 
-// Initializer is the reduced public pre-execution lifecycle hook for inputs or
-// other handler-bound values that need request-context initialization without
-// binding themselves to Datly runtime internals.
-type Initializer interface {
-	Init(ctx context.Context) error
-}
-
-// Finalizer is the reduced public success-path lifecycle hook for outputs or
-// other handler-bound values that need post-execution cleanup/follow-up without
-// exposing transport- or runtime-specific finalization concerns.
-type Finalizer interface {
-	Finalize(ctx context.Context) error
-}
-
-// ErrorFinalizer is the reduced public error-aware lifecycle hook for outputs
-// that need the terminal handler error when finalizing.
-type ErrorFinalizer interface {
-	Finalize(ctx context.Context, err error) error
-}
-
 // WriteInitializer is implemented by typed entities that need preparation
 // after generated relation keys and sequences are available but before a
 // generated handler validates or queues the entity for persistence.
