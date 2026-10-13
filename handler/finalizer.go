@@ -13,6 +13,18 @@ type InvokerFinalizer interface {
 	Finalize(ctx context.Context, invoker ComponentInvoker) error
 }
 
+// InvokerErrorFinalizer composes dependencies before transaction completion
+// with the accumulated operation error at the callback boundary: handler,
+// output-binding, or preparation failures encountered before this call. The
+// error is nil on success and is retained even when Finalize returns nil.
+// The invoker is valid only during Finalize; child calls must be awaited.
+// Hook and child errors prevent owned commit. This hook does not observe early
+// failures that produced no output, or future drain/commit failures. Outcome
+// finalization remains a separate phase after transaction completion.
+type InvokerErrorFinalizer interface {
+	Finalize(ctx context.Context, invoker ComponentInvoker, operationErr error) error
+}
+
 // Finalizer is the reduced public success-path lifecycle hook for outputs or
 // other handler-bound values that need post-execution cleanup/follow-up without
 // exposing transport- or runtime-specific finalization concerns.
