@@ -23,3 +23,14 @@ type Binder interface {
 	Bind(ctx context.Context, target any) error
 	Lookup(ctx context.Context, key ValueKey) (any, bool, error)
 }
+
+// ScopedInputBinder is a static opt-in on a typed custom contract. The engine
+// binds its exact default scope before Exec; named scopes remain handler-selected.
+type ScopedInputBinder interface{ BindsInputByScope() bool }
+
+// ScopedBinder selects an exact declared scope on the canonical input. Bind
+// selects the empty scope again. It is valid only during the handler invocation.
+type ScopedBinder interface {
+	Binder
+	BindScope(ctx context.Context, target any, scope string) error
+}
