@@ -15,12 +15,12 @@ const FrameworkValidatorKey ValueKey = "frameworkValidator"
 // Batch policies retain each candidate's matched prior row and diagnostic
 // location; candidates in a batch must share the entity type and connector.
 type ValidationOptions struct {
-	// CheckOnly validates selected Go, not-null and reference constraints on an
-	// associated value that is not being mutated. It requires empty Action,
+	// CheckOnly runs selected Go, not-null and reference constraints without
+	// mutation provenance. It requires empty Action,
 	// explicit Fields, Shallow and CheckUnique=false. Mutation provenance,
 	// HonorPresence, deferrals and satisfied references are forbidden. It uses
-	// the scoped connection/transaction without flushing queued DML. Batches
-	// currently reject this mode; use one typed entity per call.
+	// the scoped connection/transaction without flushing queued DML. A typed
+	// batch must use CheckOnly for every candidate; Go checks precede SQL checks.
 	CheckOnly bool
 	Action    WriteAction
 	// CheckUnique and CheckRef select native database checks for this pass.
@@ -41,6 +41,12 @@ type ValidationOptions struct {
 	// invariant-backfilled fields may be covered without becoming client writes.
 	// Names are canonical Go field names, as with EntityState.PreviousFields.
 	Fields FieldSet
+	// GoFields optionally selects independent Go-check coverage for CheckOnly.
+	// Nil (including typed nil) defaults to Fields, never to all fields. An
+	// explicit all-fields set requests complete Go checks. Both sets are
+	// snapshotted before connection access or predicate execution. Other modes
+	// reject effective nonnil GoFields.
+	GoFields FieldSet
 	// HonorPresence enables supplied-field coverage for an INSERT business pass.
 	// It requires Fields and forbids Previous evidence. Generated writers always
 	// run a complete final validation pass before queuing the write.
