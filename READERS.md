@@ -98,6 +98,30 @@ typed result for the view. Results across partitions/batches have no guaranteed
 input order; sort explicitly for an order-sensitive reduction. Relation readers
 invoke reduction after all batches finish. Preserve the expected result shape.
 
+## Predicate author and indexed cache
+
+Native predicates can bind the current canonical input with an `Input *Input`
+field tagged `bind:"kind=input"`. If existing predicate helpers read `handler.InputKey`,
+attach that bound input to their local Compute context. Keep the public reader
+Input unchanged; query selector companions remain separate from its ABI.
+
+After resolving authorization through the invocation's scoped component invoker,
+`handler.SelectCacheIndex(ctx, column, authorizedValues)` selects the configured
+index using the authorized IDs. Propagate its error. Repeating the same selection
+is allowed; a conflicting selection fails. `handler.DenyCacheIndex(ctx)` is sticky
+for this invocation and disables indexed replay while retaining exact query
+caching. Use it for denied or otherwise unsuitable selections; never substitute
+raw request IDs or sentinel values.
+
+`handler.CacheIndexIdentity(ctx)` returns `(bool, error)` for the reader's sealed,
+isolated key render. Only that render may omit a predicate that would otherwise
+change the intended broad identity. Actual SQL and miss fallback remain fully
+authorized. Bind and expose the prepared canonical input to this check; inherited,
+stale or mismatched input state fails. Native trusted warmup metadata lives in
+`handler/exec.InvocationFromContext`, separately from cache identity. Verify a
+warm-cache hit using old values and a cold-cache miss using current authorized
+rows; a successful warmup or SQL dry run alone does not establish reuse.
+
 ## Cube author
 
 Cubes add dimensions, measures and aggregation semantics to a declared reader.
