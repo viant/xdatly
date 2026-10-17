@@ -34,3 +34,14 @@ type ComponentRequest struct {
 type ComponentInvoker interface {
 	Invoke(context.Context, ComponentRequest) (any, error)
 }
+
+// ComponentResponseBinder binds the exact declared output of an ordinary
+// invocation. Declared business responses retain their original cause.
+type ComponentResponseBinder interface {
+	BindResponse(context.Context, ComponentRequest, any) (BoundResponse, error)
+}
+
+type BoundResponse struct {
+	StatusCode int
+	Cause      error
+}
