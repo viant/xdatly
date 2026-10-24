@@ -19,3 +19,17 @@ type HandlerFunc func(context.Context, any) (*Criteria, error)
 func (f HandlerFunc) Compute(ctx context.Context, value any) (*Criteria, error) {
 	return f(ctx, value)
 }
+
+// VariadicHandler receives trusted authored arguments in addition to the bound
+// input. Implement this optional contract to accept handler configuration;
+// existing Handler implementations and HandlerFunc remain unchanged.
+type VariadicHandler interface {
+	Compute(context.Context, any, ...any) (*Criteria, error)
+}
+
+// VariadicHandlerFunc adapts a function to VariadicHandler.
+type VariadicHandlerFunc func(context.Context, any, ...any) (*Criteria, error)
+
+func (f VariadicHandlerFunc) Compute(ctx context.Context, value any, args ...any) (*Criteria, error) {
+	return f(ctx, value, args...)
+}
