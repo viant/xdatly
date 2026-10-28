@@ -21,8 +21,10 @@ type ComponentTarget struct {
 // and execution path. Providers overlay the inherited request scope. Calls
 // retain the caller's buffered writes and transaction completion owner.
 type ComponentRequest struct {
-	Target     ComponentTarget
-	Input      any
+	Target ComponentTarget
+	Input  any
+	// Rows opts the target flat reader into non-retaining row delivery.
+	Rows       *RowConsumer       `json:"-"`
 	ExtraInput *InputSeed         `json:"-"`
 	Providers  []locator.Provider `json:"-"`
 	Completion func(Outcome)      `json:"-"`
