@@ -37,3 +37,27 @@ type Finalizer interface {
 type ErrorFinalizer interface {
 	Finalize(ctx context.Context, err error) error
 }
+
+// BeforeCommitValidator is an optional output validation hook. The native owner
+// calls it once after every buffered write has physically drained and before any
+// locally owned transaction commits. A returned error prevents owned commit.
+// Earlier operation/drain errors skip this hook; Finalize and outcome-aware
+// finalization retain their existing phases.
+//
+// The supplied invoker is valid only during this callback and admits canonical
+// native readers over the owner's already-open transactions. It cannot enqueue
+// writes, open independent units, publish messages, stream rows, or complete the
+// owner. Calls must be awaited. Managed violations remain failures even if the
+// hook catches their immediate error. Do not retain the invoker or launch work
+// beyond the callback. Captured writer values and presence remain read-only.
+//
+// Callback context retains caller identity, values, deadline and cancellation,
+// but not the owner's database binding. A separately owned external authority
+// reader therefore retains its independent committed view; only this invoker
+// receives the pending owner transaction. Caller-supplied transactions retain
+// caller completion ownership: validation precedes handoff, not a later commit
+// performed outside the native invocation. This contract does not sandbox
+// arbitrary Go handles or external side effects.
+type BeforeCommitValidator interface {
+	BeforeCommit(context.Context, ComponentInvoker) error
+}
