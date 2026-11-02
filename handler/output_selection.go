@@ -2,7 +2,8 @@ package handler
 
 import "context"
 
-// OutputFieldFilter describes the selected public output paths.
+// OutputFieldFilter describes the selected public output paths. Parent path
+// segments use encoded JSON names; the leaf field uses its canonical Go name.
 type OutputFieldFilter interface{ ExcludePath([]string, string) bool }
 
 // OutputSelection optionally forwards one explicitly delegated child projection.
