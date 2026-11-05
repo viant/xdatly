@@ -69,3 +69,17 @@ completion; it is not a timing-equivalent replacement for post-completion
 Go cannot overload methods: choose one Init signature per input type and one
 Finalize signature per output type. Regeneration preserves existing authored
 lifecycle files.
+
+## Shared Binder interface
+
+`handler.Binder` now embeds `github.com/viant/bindly.Binder` and retains its existing
+`Lookup` method. `binder.Bind(ctx, target)` calls remain valid. The shared Bind method
+accepts `...bindly.BindOption`; implementations and test doubles must include that
+variadic parameter. Explicitly typed method values must use the variadic function
+type or a two-argument closure. This is a source change for implementers, not a
+change to ordinary call syntax.
+
+Invocation adapters still own source and scope semantics. Datly's ordinary binder
+defaults to the canonical input and forwards explicit options. Specialized scoped
+and SQL-view binders preserve their existing admission rules and reject unsupported
+options rather than silently dropping them. Bindly remains the execution engine.

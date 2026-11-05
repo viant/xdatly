@@ -92,7 +92,7 @@ Those are runtime/build integration concerns.
 
 | Method | Purpose |
 | --- | --- |
-| `Bind(ctx, target)` | Populate a destination using the invocation's binding rules. |
+| `Bind(ctx, target, ...bindly.BindOption)` | Shared Bindly interface; populate a destination using the invocation's binding rules. Existing calls may omit options. |
 | `Lookup(ctx, key)` | Resolve one scoped value. Unknown keys return `(nil, false, nil)`; errors represent failed resolution of a known key. |
 
 Reserved binder keys include `handler.InputKey`, `handler.SelectorsKey`,

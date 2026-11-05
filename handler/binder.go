@@ -1,6 +1,10 @@
 package handler
 
-import "context"
+import (
+	"context"
+
+	"github.com/viant/bindly"
+)
 
 type ValueKey string
 
@@ -16,11 +20,13 @@ const (
 
 // Binder resolves and binds values for one invocation scope.
 // It is intentionally narrow and does not expose service construction.
+// Bind is the shared Bindly interface. Existing two-argument calls are unchanged;
+// specialized invocation binders may reject options that their scope cannot honor.
 //
 // Lookup returns (nil, false, nil) for an unknown key.
 // An error is reserved for resolution failures of a known key.
 type Binder interface {
-	Bind(ctx context.Context, target any) error
+	bindly.Binder
 	Lookup(ctx context.Context, key ValueKey) (any, bool, error)
 }
 

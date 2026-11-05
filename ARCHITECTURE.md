@@ -47,6 +47,7 @@ The SDK does not implement a second mutation engine.
 | `handler`, `handler/mutation` | Handler interfaces, scoped capabilities, mutation hooks and completion contracts |
 | `bind`, `state`, `reader` | Input/state and query-selection contracts |
 | `codec`, `predicate`, `docs` | Extensible conversion, predicates and API descriptions |
+| `contract` | Caller-dependent Name/Tag adjustments and policy identity; hosts own binding, traversal and codec integration |
 | `response` | Response status, errors and output operations |
 | `async`, `exec` | Job and execution contracts |
 | `tracing`, `logger`, `mbus` | Observation and messaging interfaces |

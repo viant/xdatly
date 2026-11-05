@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/viant/bindly"
 	xhandler "github.com/viant/xdatly/handler"
 )
 
@@ -28,7 +29,7 @@ type testBinder struct {
 	errs   map[xhandler.ValueKey]error
 }
 
-func (b *testBinder) Bind(_ context.Context, target any) error {
+func (b *testBinder) Bind(_ context.Context, target any, options ...bindly.BindOption) error {
 	_ = target
 	return nil
 }

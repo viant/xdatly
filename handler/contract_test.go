@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/viant/bindly"
 	"github.com/viant/xdatly/response"
 )
 
@@ -13,7 +14,7 @@ type testBinder struct {
 	values     map[ValueKey]any
 }
 
-func (b *testBinder) Bind(_ context.Context, target any) error {
+func (b *testBinder) Bind(_ context.Context, target any, options ...bindly.BindOption) error {
 	b.lastTarget = target
 	return nil
 }

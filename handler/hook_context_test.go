@@ -4,12 +4,13 @@ import (
 	"context"
 	"testing"
 
+	"github.com/viant/bindly"
 	"github.com/viant/xdatly/response"
 )
 
 type hookTestBinder struct{}
 
-func (b *hookTestBinder) Bind(_ context.Context, target any) error {
+func (b *hookTestBinder) Bind(_ context.Context, target any, options ...bindly.BindOption) error {
 	_ = target
 	return nil
 }
