@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/token"
 	"reflect"
+	"strings"
 
 	"github.com/viant/tagly/choice"
 	"github.com/viant/tagly/tags"
@@ -49,8 +50,12 @@ func (f *Field) RemoveTag(key string) *Field { return f.set(key, nil) }
 func (f *Field) Hide() *Field {
 	return f.SetTag("json", "-").SetTag("internal", "true").SetTag("mcp", "-")
 }
-func (f *Field) Required() *Field                   { return f.SetTag("required", "true").SetTag("optional", "false") }
-func (f *Field) Optional() *Field                   { return f.SetTag("required", "false").SetTag("optional", "true") }
+func (f *Field) Required() *Field {
+	return f.SetTag("required", "true").RemoveTag("optional").bindingRequired(true)
+}
+func (f *Field) Optional() *Field {
+	return f.RemoveTag("required").RemoveTag("optional").bindingRequired(false)
+}
 func (f *Field) SetDescription(value string) *Field { return f.SetTag("description", value) }
 func (f *Field) SetExample(value string) *Field     { return f.SetTag("example", value) }
 
@@ -128,4 +133,53 @@ func validTagKey(key string) bool {
 		}
 	}
 	return true
+}
+
+// Keep the native binding annotation consistent with the public field metadata.
+// The existing Tagly tokenizer preserves quoted/default values and their order.
+func (f *Field) bindingRequired(required bool) *Field {
+	if f.err != nil {
+		return f
+	}
+	for _, key := range []string{"parameter", "bind"} {
+		raw, ok := f.Tag.Lookup(key)
+		if !ok {
+			continue
+		}
+		name, rest := tags.Values(raw).Name()
+		if strings.Contains(name, "=") {
+			name, rest = "", tags.Values(raw)
+		}
+		var parts []string
+		changed := false
+		err := rest.MatchRawPairs(func(k, v string) error {
+			if k == "required" {
+				changed = true
+				return nil
+			}
+			if v == "" {
+				parts = append(parts, k)
+			} else {
+				parts = append(parts, k+"="+v)
+			}
+			return nil
+		})
+		if err != nil {
+			f.err = err
+			return f
+		}
+		if required {
+			parts = append(parts, "required=true")
+			changed = true
+		}
+		if !changed {
+			continue
+		}
+		value := strings.Join(parts, ",")
+		if name != "" || strings.HasPrefix(raw, ",") {
+			value = name + "," + value
+		}
+		f.SetTag(key, value)
+	}
+	return f
 }

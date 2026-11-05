@@ -4,8 +4,34 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/viant/bindly"
 	"github.com/viant/tagly/choice"
 )
+
+func TestOptionalRemovesNativeBindingRequirementWithoutLosingMetadata(t *testing.T) {
+	for _, key := range []string{"parameter", "bind"} {
+		f := (&Field{Name: "Value"}).SetTag(key, `,kind=query,in=value,required=true,value='a,b'`).SetTag("required", "true")
+		f.Optional()
+		if _, ok := f.Tag.Lookup("required"); ok {
+			t.Fatal("explicit flag remains")
+		}
+		binding, ok, err := bindly.BindingSpecFromField(reflect.StructField{Name: f.Name, Type: reflect.TypeOf(""), Tag: f.Tag})
+		if err != nil || !ok {
+			t.Fatal(err)
+		}
+		if binding.Required != nil && *binding.Required {
+			t.Fatal("binding still required")
+		}
+		if binding.Location.In != "value" || binding.DefaultValue != "a,b" {
+			t.Fatalf("binding metadata changed: %+v", binding)
+		}
+		f.Required()
+		binding, _, err = bindly.BindingSpecFromField(reflect.StructField{Name: f.Name, Type: reflect.TypeOf(""), Tag: f.Tag})
+		if err != nil || binding.Required == nil || !*binding.Required {
+			t.Fatal("required binding not restored", err)
+		}
+	}
+}
 
 func TestFieldUpsertAndExplicitRemoval(t *testing.T) {
 	original := &Field{Name: "Mode", Tag: `sqlx:"MODE" json:"mode,omitempty" choice:"a" choice:"b" description:"old"`}
@@ -13,7 +39,7 @@ func TestFieldUpsertAndExplicitRemoval(t *testing.T) {
 	if err := changed.Validate(reflect.TypeOf("")); err != nil {
 		t.Fatal(err)
 	}
-	for key, want := range map[string]string{"json": "-", "internal": "true", "mcp": "-", "description": "", "example": `a"b`, "required": "true", "optional": "false", "sqlx": "MODE"} {
+	for key, want := range map[string]string{"json": "-", "internal": "true", "mcp": "-", "description": "", "example": `a"b`, "required": "true", "sqlx": "MODE"} {
 		if got, ok := changed.Tag.Lookup(key); !ok || got != want {
 			t.Fatalf("%s=%q present=%v", key, got, ok)
 		}
@@ -26,8 +52,11 @@ func TestFieldUpsertAndExplicitRemoval(t *testing.T) {
 		t.Fatal("original mutated")
 	}
 	changed.Optional()
-	if changed.Tag.Get("required") != "false" || changed.Tag.Get("optional") != "true" {
-		t.Fatal("optional did not replace")
+	if _, found := changed.Tag.Lookup("required"); found {
+		t.Fatal("optional retained explicit requiredness")
+	}
+	if _, found := changed.Tag.Lookup("optional"); found {
+		t.Fatal("optional default should need no flag")
 	}
 	changed.RemoveTag("choice")
 	if _, ok := changed.Tag.Lookup("choice"); ok {
@@ -68,5 +97,42 @@ func BenchmarkFieldHide(b *testing.B) {
 		if v.Err() != nil {
 			b.Fatal(v.Err())
 		}
+	}
+}
+
+func TestOptionalFirstBindingOption(t *testing.T) {
+	for _, tag := range []reflect.StructTag{
+		`bind:"required=true,kind=query,in=value"`,
+		`parameter:"Value,required=true,kind=query,in=value"`,
+		`bind:"kind=query,in=value,required=true"`,
+	} {
+		f := (&Field{Name: "Value", Tag: tag}).Optional()
+		binding, ok, err := bindly.BindingSpecFromField(reflect.StructField{Name: f.Name, Type: reflect.TypeFor[string](), Tag: f.Tag})
+		if err != nil || !ok {
+			t.Fatalf("%s: %v", f.Tag, err)
+		}
+		if binding.Required != nil && *binding.Required || binding.Location.Kind != "query" || binding.Location.In != "value" {
+			t.Fatalf("lost binding metadata: %+v", binding)
+		}
+	}
+}
+
+func BenchmarkFieldOptional(b *testing.B) {
+	for _, tc := range []struct {
+		name string
+		tag  reflect.StructTag
+	}{
+		{"unchanged", `json:"value"`},
+		{"binding", `json:"value" required:"true" parameter:",kind=query,in=value,required=true,value='a,b'"`},
+	} {
+		b.Run(tc.name, func(b *testing.B) {
+			f := Field{Name: "Value", Tag: tc.tag}
+			b.ReportAllocs()
+			for i := 0; i < b.N; i++ {
+				if err := f.Clone().Optional().Err(); err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
 	}
 }

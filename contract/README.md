@@ -58,9 +58,10 @@ semantics. This SDK addition does not implement a metadata invocation scope.
 - Check `Field.Validate(originalFieldType)` before accepting a replacement. Helpers
   record errors so fluent calls can be checked once. Typed enum normalization uses
   `tagly/choice`; enum metadata does not install runtime membership validation.
-- `Hide` upserts `json:"-" internal:"true" mcp:"-"`. Required/Optional upsert explicit
-  booleans; the consuming schema and validator must interpret those booleans, not
-  mere tag presence. SetEnum replaces the ordered repeated-choice group.
+- `Hide` upserts `json:"-" internal:"true" mcp:"-"`. Fields are optional by default.
+  `Required` sets `required:"true"`; `Optional` removes required/optional flags.
+  Both synchronize requiredness in an existing `bind` or `parameter` annotation
+  while retaining its other options. SetEnum replaces the ordered repeated-choice group.
 - Cache immutable effective types/plans by generation, component/route, direction,
   original type, provider configuration and policy name. Empty names disable retained
   caching. Never cache callbacks or captured request state. Authenticate and compute
