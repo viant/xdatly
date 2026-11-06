@@ -84,3 +84,5 @@ retaining storage types, offsets, embedding and methods. Native codec options ca
 consume it without constructing replacement runtime types. A nil/no-change policy
 keeps the original linked path. Custom JSON methods still own their complete
 representation; direct field edits inside those custom owners are unsupported.
+
+See [POST/PATCH contract example](operation.md) for a direct hook using `Field.IsPK()`, neutral pricing/commission examples, and cache-key controls.

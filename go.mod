@@ -15,7 +15,7 @@ require (
 
 require (
 	github.com/viant/parsly v0.3.3 // indirect
-	github.com/viant/structology v0.10.2-0.20261106060238-ca90155f0f98 // indirect
+	github.com/viant/structology v0.10.2-0.20261106143941-ed3b2d84154c // indirect
 	github.com/viant/tagly v0.4.2-0.20261106060238-fe360d6f7ac4
 )
 

@@ -23,6 +23,9 @@ type Provider interface {
 // Hosts cache effective types/plans, never this policy's captured request state.
 type Policy struct {
 	Name string
+	// NoCache opts out of host variant reuse even when Name is set. It does not
+	// disable unrelated codec/type caches or cache authorization decisions.
+	NoCache bool
 	// Field receives the original containing struct type and its canonical path
 	// (excluding the field name). The supplied field is read-only; use Clone.
 	// Nil or an equivalent replacement retains the original field. Only Name
