@@ -89,7 +89,9 @@ See [POST/PATCH contract example](operation.md) for a direct hook using `Field.I
 
 ## Copy-on-write field helpers
 
-Helpers can be called directly: `return field.Hide().SetDescription("Internal"), nil`.
+Hide a field with `return field.Hide(), nil`. Its description is not published,
+so adding one to a hidden field is unnecessary. Demonstrate chaining on a visible
+field instead: `return field.Optional().SetDescription("Commission rate"), nil`.
 A private `cloned` flag lets the first actual edit obtain a writable copy and lets
 later helpers in that chain reuse it. Equivalent edits return the existing field.
 Datly supplies a read-only snapshot to each callback. Explicit writable clones
