@@ -27,7 +27,8 @@ type Policy struct {
 	// disable unrelated codec/type caches or cache authorization decisions.
 	NoCache bool
 	// Field receives the original containing struct type and its canonical path
-	// (excluding the field name). The supplied field is read-only; use Clone.
+	// (excluding the field name). Use helper return values for copy-on-write edits; use Clone before assigning
+	// Name or Tag directly.
 	// Nil or an equivalent replacement retains the original field. Only Name
 	// and Tag can change. The host must check replacement.Validate(originalType)
 	// before publishing or caching the effective contract.

@@ -32,7 +32,7 @@ func (*Output) Contract(ctx context.Context, binder bindly.Binder) (*contract.Po
             if field.Tag.Get("access") != "financial" {
                 return nil, nil
             }
-            return field.Clone().Hide(), nil
+            return field.Hide(), nil
         },
     }, nil
 }
@@ -55,7 +55,7 @@ semantics. This SDK addition does not implement a metadata invocation scope.
   direct-field traversal; do not use flattened visible fields to rebuild types.
 - Supply original parent type and canonical parent path. Only Name and Tag are
   schema edits. Maintain canonical binding/name mappings and original method authority.
-- `field.Clone().SkipChildren()` is a policy-local traversal decision. Nil continues
+- `field.SkipChildren()` is a policy-local traversal decision. Nil continues
   traversal. A skip-only result retains linked identity; nested policies and other
   enclosing policies remain independent. Never persist the skip flag into tags or
   propagate it from one policy's result into another policy's callback.
@@ -86,3 +86,17 @@ keeps the original linked path. Custom JSON methods still own their complete
 representation; direct field edits inside those custom owners are unsupported.
 
 See [POST/PATCH contract example](operation.md) for a direct hook using `Field.IsPK()`, neutral pricing/commission examples, and cache-key controls.
+
+## Copy-on-write field helpers
+
+Helpers can be called directly: `return field.Hide().SetDescription("Internal"), nil`.
+A private `cloned` flag lets the first actual edit obtain a writable copy and lets
+later helpers in that chain reuse it. Equivalent edits return the existing field.
+Datly supplies a read-only snapshot to each callback. Explicit writable clones
+can be reused within an edit chain without another helper copy.
+
+Always use the returned field (`field = field.Optional()` or return the chain).
+Direct assignments to `Name` or `Tag` still require `Clone()` first. Calling
+`Clone()` on an edited field starts an independent branch; it always makes a new
+copy. Writable results belong to one edit chain and should not be shared for
+concurrent mutation. Unmodified baseline metadata can be reused concurrently.

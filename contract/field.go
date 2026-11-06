@@ -11,6 +11,7 @@ import (
 )
 
 // Field exposes only adjustable metadata, not type, layout or embedding flags.
+// Helpers return copy-on-write metadata; callers must use the returned field.
 // Helpers record errors for Validate so chained operations remain atomic from
 // the host's perspective. Never apply a field for which Validate fails.
 type Field struct {
@@ -18,13 +19,38 @@ type Field struct {
 	Tag          reflect.StructTag
 	err          error
 	skipChildren bool
+	cloned       bool
 }
 
-func (f *Field) Clone() *Field { c := *f; return &c }
+// Clone creates an independent writable copy, even if f is already a copy.
+// Use it before assigning Name/Tag directly or when branching from an edit.
+func (f *Field) Clone() *Field { c := *f; c.cloned = true; return &c }
+
+func (f *Field) writable() *Field {
+	if f.cloned {
+		return f
+	}
+	return f.Clone()
+}
+func (f *Field) withError(err error) *Field {
+	if f.err != nil {
+		return f
+	}
+	result := f.writable()
+	result.err = err
+	return result
+}
 
 // SkipChildren declines descendant callbacks for the policy returning this
 // field. It changes no schema metadata and does not suppress nested policies.
-func (f *Field) SkipChildren() *Field  { f.skipChildren = true; return f }
+func (f *Field) SkipChildren() *Field {
+	if f.skipChildren {
+		return f
+	}
+	result := f.writable()
+	result.skipChildren = true
+	return result
+}
 func (f *Field) ChildrenSkipped() bool { return f.skipChildren }
 
 // Err reports a tag-edit error without inspecting a field's scalar type.
@@ -70,10 +96,10 @@ func (f *Field) SetExample(value string) *Field     { return f.SetTag("example",
 // RemoveTag("choice") to remove a domain, not SetEnum with an empty domain.
 func (f *Field) SetEnum(values ...string) *Field {
 	if len(values) == 0 {
-		if f.err == nil {
-			f.err = fmt.Errorf("choice domain must not be empty")
+		if f.err != nil {
+			return f
 		}
-		return f
+		return f.withError(fmt.Errorf("choice domain must not be empty"))
 	}
 	return f.set("choice", values)
 }
@@ -83,13 +109,11 @@ func (f *Field) set(key string, values []string) *Field {
 		return f
 	}
 	if !validTagKey(key) {
-		f.err = fmt.Errorf("invalid tag key %q", key)
-		return f
+		return f.withError(fmt.Errorf("invalid tag key %q", key))
 	}
 	parsed, err := tags.Parse(string(f.Tag))
 	if err != nil {
-		f.err = err
-		return f
+		return f.withError(err)
 	}
 	matched := 0
 	equal := true
@@ -125,8 +149,9 @@ func (f *Field) set(key string, values []string) *Field {
 	if !inserted {
 		appendValues()
 	}
-	f.Tag = reflect.StructTag(result.Literal())
-	return f
+	updated := f.writable()
+	updated.Tag = reflect.StructTag(result.Literal())
+	return updated
 }
 
 func validTagKey(key string) bool {
@@ -171,8 +196,7 @@ func (f *Field) bindingRequired(required bool) *Field {
 			return nil
 		})
 		if err != nil {
-			f.err = err
-			return f
+			return f.withError(err)
 		}
 		if required {
 			parts = append(parts, "required=true")
@@ -185,7 +209,7 @@ func (f *Field) bindingRequired(required bool) *Field {
 		if name != "" || strings.HasPrefix(raw, ",") {
 			value = name + "," + value
 		}
-		f.SetTag(key, value)
+		f = f.SetTag(key, value)
 	}
 	return f
 }
