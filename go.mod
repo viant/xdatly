@@ -14,7 +14,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/viant/afs v1.29.0 // indirect
 	github.com/viant/parsly v0.3.3 // indirect
-	github.com/viant/structology v0.10.2-0.20261106060238-ca90155f0f98 // indirect
+	github.com/viant/structology v0.10.2-0.20261106143941-ed3b2d84154c // indirect
 	github.com/viant/xunsafe v0.11.0 // indirect
 	golang.org/x/crypto v0.43.0 // indirect
 	golang.org/x/mod v0.28.0 // indirect
