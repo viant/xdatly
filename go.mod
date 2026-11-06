@@ -4,15 +4,18 @@ go 1.25.0
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/viant/mcp-protocol v0.11.0
+	github.com/viant/mcp-protocol v0.19.2-0.20261106041415-5280ed5df48d
 	github.com/viant/scy v0.15.4
 )
 
-require github.com/viant/x v0.6.0 // indirect
+require (
+	github.com/francoispqt/gojay v1.2.13 // indirect
+	github.com/viant/x v0.6.1-0.20261106041415-0487ec66884b
+)
 
 require (
 	github.com/viant/parsly v0.3.3 // indirect
-	github.com/viant/structology v0.10.1-0.20261005184011-cdaab8ea7dab // indirect
+	github.com/viant/structology v0.10.2-0.20261106041415-f131ad778c85 // indirect
 	github.com/viant/tagly v0.4.2-0.20261028223500-81e046a19ef9
 )
 
@@ -31,8 +34,8 @@ require (
 	github.com/lestrrat-go/option v1.0.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/viant/afs v1.29.0 // indirect
-	github.com/viant/bindly v0.5.0
-	github.com/viant/jsonrpc v0.7.5 // indirect
+	github.com/viant/bindly v0.5.1-0.20261106041415-daa8f9128968
+	github.com/viant/jsonrpc v0.20.0 // indirect
 	github.com/viant/toolbox v0.36.0 // indirect
 	github.com/viant/xreflect v0.7.3 // indirect
 	github.com/viant/xunsafe v0.11.0 // indirect
