@@ -9,7 +9,8 @@ import (
 	"github.com/viant/bindly"
 )
 
-// Provider may be implemented by a component's original linked Input or Output.
+// Provider may be implemented by an original linked view/domain type,
+// component Input/Output, or composite. Nested providers are discovered by the host.
 // The binder belongs to the current invocation. A provider must not retain it.
 // Return nil, nil to retain the original linked contract without traversal.
 type Provider interface {

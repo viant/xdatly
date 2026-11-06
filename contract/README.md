@@ -1,6 +1,6 @@
 # Caller-dependent contracts
 
-An original component Input or Output can implement `Provider`:
+A linked view/domain type, component Input/Output, or composite can implement `Provider`:
 
 ```go
 Contract(context.Context, bindly.Binder) (*contract.Policy, error)
