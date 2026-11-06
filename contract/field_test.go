@@ -11,7 +11,7 @@ import (
 func TestOptionalRemovesNativeBindingRequirementWithoutLosingMetadata(t *testing.T) {
 	for _, key := range []string{"parameter", "bind"} {
 		f := (&Field{Name: "Value"}).SetTag(key, `,kind=query,in=value,required=true,value='a,b'`).SetTag("required", "true")
-		f.Optional()
+		f = f.Optional()
 		if _, ok := f.Tag.Lookup("required"); ok {
 			t.Fatal("explicit flag remains")
 		}
@@ -25,7 +25,7 @@ func TestOptionalRemovesNativeBindingRequirementWithoutLosingMetadata(t *testing
 		if binding.Location.In != "value" || binding.DefaultValue != "a,b" {
 			t.Fatalf("binding metadata changed: %+v", binding)
 		}
-		f.Required()
+		f = f.Required()
 		binding, _, err = bindly.BindingSpecFromField(reflect.StructField{Name: f.Name, Type: reflect.TypeOf(""), Tag: f.Tag})
 		if err != nil || binding.Required == nil || !*binding.Required {
 			t.Fatal("required binding not restored", err)
@@ -51,19 +51,19 @@ func TestFieldUpsertAndExplicitRemoval(t *testing.T) {
 	if original.Tag.Get("json") != "mode,omitempty" {
 		t.Fatal("original mutated")
 	}
-	changed.Optional()
+	changed = changed.Optional()
 	if _, found := changed.Tag.Lookup("required"); found {
 		t.Fatal("optional retained explicit requiredness")
 	}
 	if _, found := changed.Tag.Lookup("optional"); found {
 		t.Fatal("optional default should need no flag")
 	}
-	changed.RemoveTag("choice")
+	changed = changed.RemoveTag("choice")
 	if _, ok := changed.Tag.Lookup("choice"); ok {
 		t.Fatal("choice occurrences remain")
 	}
 	before := changed.Tag
-	changed.RemoveTag("absent").SetTag("json", "-")
+	changed = changed.RemoveTag("absent").SetTag("json", "-")
 	if changed.Tag != before {
 		t.Fatal("no-op changed tag")
 	}

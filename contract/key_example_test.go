@@ -30,7 +30,7 @@ func (*sparseRecord) Contract(ctx context.Context, binder bindly.Binder) (*contr
 		if field.IsPK() {
 			return nil, nil
 		}
-		adjusted := field.Clone().Optional()
+		adjusted := field.Optional()
 		if err := adjusted.Err(); err != nil {
 			return nil, err
 		}
