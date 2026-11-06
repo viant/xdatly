@@ -14,12 +14,18 @@ import (
 // Helpers record errors for Validate so chained operations remain atomic from
 // the host's perspective. Never apply a field for which Validate fails.
 type Field struct {
-	Name string
-	Tag  reflect.StructTag
-	err  error
+	Name         string
+	Tag          reflect.StructTag
+	err          error
+	skipChildren bool
 }
 
 func (f *Field) Clone() *Field { c := *f; return &c }
+
+// SkipChildren declines descendant callbacks for the policy returning this
+// field. It changes no schema metadata and does not suppress nested policies.
+func (f *Field) SkipChildren() *Field  { f.skipChildren = true; return f }
+func (f *Field) ChildrenSkipped() bool { return f.skipChildren }
 
 // Err reports a tag-edit error without inspecting a field's scalar type.
 func (f *Field) Err() error { return f.err }

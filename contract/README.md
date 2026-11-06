@@ -54,7 +54,11 @@ semantics. This SDK addition does not implement a metadata invocation scope.
   unaffected siblings and embedded structure. `viant/x/shape.CompileRewrite` owns
   direct-field traversal; do not use flattened visible fields to rebuild types.
 - Supply original parent type and canonical parent path. Only Name and Tag are
-  editable. Maintain canonical binding/name mappings and original method authority.
+  schema edits. Maintain canonical binding/name mappings and original method authority.
+- `field.Clone().SkipChildren()` is a policy-local traversal decision. Nil continues
+  traversal. A skip-only result retains linked identity; nested policies and other
+  enclosing policies remain independent. Never persist the skip flag into tags or
+  propagate it from one policy's result into another policy's callback.
 - Check `Field.Validate(originalFieldType)` before accepting a replacement. Helpers
   record errors so fluent calls can be checked once. Typed enum normalization uses
   `tagly/choice`; enum metadata does not install runtime membership validation.
@@ -71,3 +75,12 @@ semantics. This SDK addition does not implement a metadata invocation scope.
 
 The package contains contracts and field helpers only. HTTP/MCP/OpenAPI integration,
 v0 compatibility releases, codec adapters and the policy cache remain host work.
+
+## Opt-in JSON codec metadata
+
+`JSONEncoder` and `JSONDecoder` optionally accept `*shape.Representation` alongside
+an original linked instance. The metadata carries effective field names/tags while
+retaining storage types, offsets, embedding and methods. Native codec options can
+consume it without constructing replacement runtime types. A nil/no-change policy
+keeps the original linked path. Custom JSON methods still own their complete
+representation; direct field edits inside those custom owners are unsupported.

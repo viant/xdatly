@@ -136,3 +136,17 @@ func BenchmarkFieldOptional(b *testing.B) {
 		})
 	}
 }
+
+func TestSkipChildrenIsSeparateFromFieldMetadata(t *testing.T) {
+	original := &Field{Name: "Child", Tag: `json:"child"`}
+	selected := original.Clone().SkipChildren()
+	if !selected.ChildrenSkipped() || original.ChildrenSkipped() || selected.Name != original.Name || selected.Tag != original.Tag {
+		t.Fatal("skip mutated schema metadata or original field")
+	}
+	if !selected.Clone().Hide().ChildrenSkipped() {
+		t.Fatal("chained edit lost traversal decision")
+	}
+	if err := selected.Validate(reflect.TypeFor[string]()); err != nil {
+		t.Fatal(err)
+	}
+}
