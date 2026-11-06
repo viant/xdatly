@@ -102,3 +102,16 @@ Direct assignments to `Name` or `Tag` still require `Clone()` first. Calling
 `Clone()` on an edited field starts an independent branch; it always makes a new
 copy. Writable results belong to one edit chain and should not be shared for
 concurrent mutation. Unmodified baseline metadata can be reused concurrently.
+
+## MCP field names
+
+Use `return field.SetMCPName("BillingModel"), nil` to set the public MCP field name.
+The helper replaces a positional or `name=` MCP name and preserves existing
+`aliases=` and other MCP options. Go `Name`, JSON tags and binding locations are
+unchanged. For example, `json:"pricingModel" mcp:"aliases=pricing"` becomes
+`json:"pricingModel" mcp:"name=BillingModel,aliases=pricing"`.
+
+The helper follows copy-on-write rules and records invalid-name errors on the
+returned field. Names must be nonempty and cannot contain commas or control
+separators. It does not silently remove `mcp:"-"`; remove that exclusion explicitly
+before assigning a name. Other visibility tags continue to apply.
