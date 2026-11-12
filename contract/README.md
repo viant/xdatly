@@ -115,3 +115,23 @@ The helper follows copy-on-write rules and records invalid-name errors on the
 returned field. Names must be nonempty and cannot contain commas or control
 separators. It does not silently remove `mcp:"-"`; remove that exclusion explicitly
 before assigning a name. Other visibility tags continue to apply.
+
+## SQLX column metadata
+
+Use `field.Column()` to read the explicit SQLX column without changing the field.
+It supports positional names and `name=` / `column=` overrides (last option wins).
+A missing tag, a selected `-` column, a nil field or an `on` relation returns `""`.
+It preserves `|` aliases and does not infer names or apply SQLX namespace/case rules.
+Ordinary unquoted tags allocate nothing; quoted/scoped options use the existing
+Tagly tokenizer with the pinned SQLX parser's semantics. No parsed result is cached,
+so calls after `SetTag`, `RemoveTag` or direct edits observe the current tag.
+
+```go
+if field.Column() == "COMMISSION" {
+    return field.Hide(), nil
+}
+```
+
+Use `field.Datapoint()` for the nonempty column, falling back to the Go field
+name. This includes `sqlx:"-"` falling back to the field name. A nil field returns
+`""`. It reuses `Column()` and adds no parsing, caching or allocation.
