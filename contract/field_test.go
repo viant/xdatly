@@ -89,6 +89,59 @@ func TestFieldEnumTypeOrderAndErrors(t *testing.T) {
 	}
 }
 
+func TestRemoveEnumChoicesPreservesDeclaredDomain(t *testing.T) {
+	original := &Field{Name: "Objective", Tag: `json:"objective" choice:"1:AWARENESS" description:"" choice:"2:ENGAGEMENT" choice:"3:CONVERSION" description:"objective" choice:"4:ROAS" choice:"5:CPSV" enumStyle:"literal"`}
+	filtered := original.RemoveEnumChoices("4:ROAS", "5:CPSV", "4:ROAS")
+	if err := filtered.Validate(reflect.TypeFor[int]()); err != nil {
+		t.Fatal(err)
+	}
+	want := reflect.StructTag(`json:"objective" choice:"1:AWARENESS" description:"" choice:"2:ENGAGEMENT" choice:"3:CONVERSION" description:"objective" enumStyle:"literal"`)
+	if filtered.Tag != want {
+		t.Fatalf("filtered tags: got %s, want %s", filtered.Tag, want)
+	}
+	originalChoices, err := choice.Tags(original.Tag)
+	if err != nil || len(originalChoices) != 5 || original.Err() != nil {
+		t.Fatalf("shared field mutated: %v, %v", originalChoices, err)
+	}
+	if filtered == original {
+		t.Fatal("helper did not copy shared metadata")
+	}
+	if original.RemoveEnumChoices() != original {
+		t.Fatal("no-op copied metadata")
+	}
+	branch := filtered.Clone().RemoveEnumChoices("3:CONVERSION")
+	if branch.Tag == filtered.Tag || filtered.Tag != want {
+		t.Fatal("branched removal mutated filtered metadata")
+	}
+}
+
+func TestRemoveEnumChoicesErrorsAreAtomic(t *testing.T) {
+	for _, tc := range []struct {
+		name   string
+		tag    reflect.StructTag
+		remove []string
+	}{
+		{"unknown", `json:"mode" choice:"a" choice:"b"`, []string{"a", "unknown"}},
+		{"all", `json:"mode" choice:"a" choice:"b"`, []string{"a", "b"}},
+		{"absent", `json:"mode"`, []string{"a"}},
+		{"malformed", `choice:"a" json:"unterminated`, []string{"a"}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			original := &Field{Name: "Mode", Tag: tc.tag}
+			filtered := original.RemoveEnumChoices(tc.remove...)
+			if filtered.Validate(reflect.TypeFor[string]()) == nil {
+				t.Fatal("invalid removal accepted")
+			}
+			if original.Err() != nil || original.Tag != tc.tag || filtered.Tag != tc.tag {
+				t.Fatal("failed removal mutated original or partially applied tags")
+			}
+			if filtered.RemoveEnumChoices("b").Err() != filtered.Err() {
+				t.Fatal("chained removal replaced original error")
+			}
+		})
+	}
+}
+
 func BenchmarkFieldHide(b *testing.B) {
 	f := Field{Name: "Value", Tag: `sqlx:"VALUE" json:"value,omitempty" description:"Value"`}
 	b.ReportAllocs()
