@@ -26,10 +26,10 @@ func TestOriginalNominalErrorDataAndMethodContract(t *testing.T) {
 		}
 	}
 	ptr := reflect.PointerTo(typ)
-	if ptr.NumMethod() != 4 {
+	if ptr.NumMethod() != 5 {
 		t.Fatal("expanded method set", ptr.NumMethod())
 	}
-	for _, name := range []string{"StatusCode", "SetStatusCode", "Reader", "Error"} {
+	for _, name := range []string{"StatusCode", "SetStatusCode", "Reader", "Error", "Unwrap"} {
 		if _, ok := ptr.MethodByName(name); !ok {
 			t.Fatal("missing method", name)
 		}
@@ -40,8 +40,8 @@ func TestOriginalNominalErrorDataAndMethodContract(t *testing.T) {
 		StatusCode() int
 		SetStatusCode(int)
 	} = &Error{}
-	if _, ok := contracts.(interface{ Unwrap() error }); ok {
-		t.Fatal("legacy error gained wrapping behavior")
+	if _, ok := contracts.(interface{ Unwrap() error }); !ok {
+		t.Fatal("legacy error lost private cause wrapping")
 	}
 	if _, ok := contracts.(interface{ ResponseBody() any }); ok {
 		t.Fatal("legacy error gained explicit body behavior")

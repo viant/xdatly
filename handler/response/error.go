@@ -20,3 +20,11 @@ func (e *Error) StatusCode() int        { return e.Code }
 func (e *Error) SetStatusCode(code int) { e.Code = code }
 func (e *Error) Reader() io.Reader      { return strings.NewReader(e.Message) }
 func (e *Error) Error() string          { return e.Message }
+
+// Unwrap retains private cause identity without changing the legacy wire body.
+func (e *Error) Unwrap() error {
+	if e == nil {
+		return nil
+	}
+	return e.Err
+}
