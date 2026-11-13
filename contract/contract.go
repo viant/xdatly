@@ -22,7 +22,15 @@ type Provider interface {
 // An empty Name disables retained variant caching. A nil Field makes no changes.
 // Hosts cache effective types/plans, never this policy's captured request state.
 type Policy struct {
-	Name string
+	// DiscoveryAlternatives declares complete finite output policies in place of
+	// this owner's selected policy for discovery only. Each alternative retains
+	// canonical storage and composes with every other nested/enclosing owner.
+	// Construct alternatives from the same authorization decision as Field; the
+	// host does not invoke Contract again for each branch. Calls use only Field.
+	// Nil/empty retains the selected policy. Nil entries and recursive alternatives
+	// are invalid. Names and NoCache follow the ordinary variant rules.
+	DiscoveryAlternatives []*Policy
+	Name                  string
 	// NoCache opts out of host variant reuse even when Name is set. It does not
 	// disable unrelated codec/type caches or cache authorization decisions.
 	NoCache bool
