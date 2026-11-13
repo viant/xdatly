@@ -89,6 +89,31 @@ func TestFieldEnumTypeOrderAndErrors(t *testing.T) {
 	}
 }
 
+func TestRemoveEnumChoicesPreservesDeclaredDomain(t *testing.T) {
+	original := &Field{Name: "Objective", Tag: `json:"objective" choice:"1:AWARENESS" choice:"2:ENGAGEMENT" choice:"3:CONVERSION" choice:"4:ROAS" choice:"5:CPSV" enumStyle:"literal"`}
+	filtered := original.Clone().RemoveEnumChoices("4:ROAS", "5:CPSV")
+	if err := filtered.Validate(reflect.TypeOf(int(0))); err != nil {
+		t.Fatal(err)
+	}
+	got, err := choice.Tags(filtered.Tag)
+	if err != nil || !reflect.DeepEqual(got, []string{"1:AWARENESS", "2:ENGAGEMENT", "3:CONVERSION"}) {
+		t.Fatalf("filtered choices: %v, %v", got, err)
+	}
+	if filtered.Tag.Get("json") != "objective" || filtered.Tag.Get("enumStyle") != "literal" {
+		t.Fatalf("unrelated tags changed: %s", filtered.Tag)
+	}
+	originalChoices, err := choice.Tags(original.Tag)
+	if err != nil || len(originalChoices) != 5 {
+		t.Fatalf("shared field mutated: %v, %v", originalChoices, err)
+	}
+	if err := original.Clone().RemoveEnumChoices("6:UNKNOWN").Validate(reflect.TypeOf(int(0))); err == nil {
+		t.Fatal("undeclared choice silently accepted")
+	}
+	if err := original.Clone().RemoveEnumChoices(originalChoices...).Validate(reflect.TypeOf(int(0))); err == nil {
+		t.Fatal("empty domain silently accepted")
+	}
+}
+
 func BenchmarkFieldHide(b *testing.B) {
 	f := Field{Name: "Value", Tag: `sqlx:"VALUE" json:"value,omitempty" description:"Value"`}
 	b.ReportAllocs()

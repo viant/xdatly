@@ -78,6 +78,50 @@ func (f *Field) SetEnum(values ...string) *Field {
 	return f.set("choice", values)
 }
 
+// RemoveEnumChoices removes exact declared choice tags while preserving their
+// order and every unrelated field tag. Callers should clone shared field
+// metadata before applying a request-scoped policy. Unknown choices and an
+// empty remaining domain are errors, so a stale policy cannot widen a schema.
+func (f *Field) RemoveEnumChoices(values ...string) *Field {
+	if f.err != nil || len(values) == 0 {
+		return f
+	}
+	parsed, err := tags.Parse(string(f.Tag))
+	if err != nil {
+		f.err = err
+		return f
+	}
+	remove := make(map[string]bool, len(values))
+	for _, value := range values {
+		remove[value] = false
+	}
+	remaining := 0
+	result := make(tags.Tags, 0, len(parsed))
+	for _, item := range parsed {
+		if item.Name == "choice" {
+			value := string(item.Values)
+			if _, selected := remove[value]; selected {
+				remove[value] = true
+				continue
+			}
+			remaining++
+		}
+		result = append(result, item)
+	}
+	for _, value := range values {
+		if !remove[value] {
+			f.err = fmt.Errorf("enum choice %q is not declared", value)
+			return f
+		}
+	}
+	if remaining == 0 {
+		f.err = fmt.Errorf("removing enum choices would leave an empty domain")
+		return f
+	}
+	f.Tag = reflect.StructTag(result.Literal())
+	return f
+}
+
 func (f *Field) set(key string, values []string) *Field {
 	if f.err != nil {
 		return f
