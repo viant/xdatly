@@ -106,6 +106,10 @@ func Deny(ctx context.Context) error {
 	s.denied = true
 	return nil
 }
+
+// Seal freezes this reader's selection. An authorization-selected column with
+// no configured index vetoes indexed replay while retaining participation.
+// Ambiguous or invalid matching indexes remain contract errors.
 func Seal(ctx context.Context, owner any, id Identity) (*Snapshot, error) {
 	f := current(ctx)
 	if f == nil {
@@ -126,7 +130,9 @@ func Seal(ctx context.Context, owner any, id Identity) (*Snapshot, error) {
 				parameter = idx.Parameter
 			}
 		}
-		if count != 1 || parameter == "" {
+		if count == 0 {
+			s.denied = true
+		} else if count != 1 || parameter == "" {
 			return nil, fmt.Errorf("cache selection requires exactly one canonical index")
 		}
 	}

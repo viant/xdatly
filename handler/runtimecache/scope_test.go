@@ -76,7 +76,11 @@ func TestVetoAndInvalidSelection(t *testing.T) {
 	check.True(t, denied)
 	_, err = EnterIdentity(ctx, owner, p, id, new(int), "CampaignId", "campaign_id", []any{1})
 	check.Error(t, err)
-	for _, indexes := range [][]Index{nil, {{"campaign_id", "CampaignId"}, {"campaign_id", "Other"}}} {
+	for _, indexes := range [][]Index{
+		{{"campaign_id", ""}},
+		{{"campaign_id", "CampaignId"}, {"campaign_id", "Other"}},
+		{{"campaign_id", "CampaignId"}, {"campaign_id", "CampaignId"}},
+	} {
 		ctx, err := InstallActual(context.Background(), owner, id, indexes)
 		check.NoError(t, err)
 		check.NoError(t, Select(ctx, "campaign_id", []any{1}))
